@@ -1,3 +1,4 @@
+console.log("JS загружен");
 document.getElementById("myButton").addEventListener("click", async function() {
   try {
     const res = await fetch("https://learnback-twta.onrender.com", {
