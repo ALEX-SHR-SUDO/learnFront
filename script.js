@@ -1,16 +1,19 @@
-console.log("JS загружен");
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("JS загружен");
 
-const button = document.getElementById("myButton");
-const responseEl = document.getElementById("response");
+  const button = document.getElementById("myButton");
+  const responseEl = document.getElementById("response");
 
-if (!button || !responseEl) {
-  console.error("Элементы кнопки или response не найдены");
-} else {
+  if (!button || !responseEl) {
+    console.error("Элементы кнопки или response не найдены");
+    return;
+  }
+
   button.addEventListener("click", async () => {
     console.log("Кнопка нажата");
 
     try {
-      const res = await fetch("https://learnback-twta.onrender.com/button-click", {
+      const res = await fetch("https://learnback-twta.onrender.com", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ clicked: true })
@@ -23,4 +26,4 @@ if (!button || !responseEl) {
       responseEl.innerText = "Ошибка при обращении к серверу";
     }
   });
-}
+});
