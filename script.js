@@ -26,9 +26,10 @@ document.addEventListener("DOMContentLoaded", () => {
       description: inputs.description.value.trim()
     };
 
-    // выводим, что отправили
+    // выводим сообщение пользователя
     const userMsg = document.createElement("div");
-    userMsg.innerText = "Вы: " + JSON.stringify(payload);
+    userMsg.classList.add("message", "user");
+    userMsg.innerText = JSON.stringify(payload);
     chatBox.appendChild(userMsg);
 
     try {
@@ -40,17 +41,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const data = await res.json();
 
-      // выводим каждый ответ построчно
+      // выводим ответы сервера построчно
       Object.values(data).forEach(replyLine => {
         const serverMsg = document.createElement("div");
-        serverMsg.innerText = "Сервер: " + replyLine;
+        serverMsg.classList.add("message", "server");
+        serverMsg.innerText = replyLine;
         chatBox.appendChild(serverMsg);
       });
 
+      // автопрокрутка вниз
       chatBox.scrollTop = chatBox.scrollHeight;
+
     } catch (err) {
       console.error(err);
       const errorMsg = document.createElement("div");
+      errorMsg.classList.add("message", "server");
       errorMsg.innerText = "Ошибка при обращении к серверу";
       chatBox.appendChild(errorMsg);
     }
