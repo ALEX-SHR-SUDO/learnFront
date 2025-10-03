@@ -97,4 +97,75 @@ img {
   p {
     font-size: 1rem;
   }
+  /* Чат */
+.chat-box {
+  border: 1px solid #ccc;
+  padding: 10px;
+  width: 100%;
+  max-width: 400px;
+  height: 250px;
+  overflow-y: auto;
+  background: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+  border-radius: 10px;
+}
+
+/* Сообщения */
+.message {
+  margin: 5px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  max-width: 80%;
+  word-wrap: break-word;
+  font-size: 1rem;
+}
+
+/* Сообщение пользователя (справа, синий) */
+.user {
+  background-color: #2196F3;
+  color: white;
+  align-self: flex-end;
+  margin-left: auto;
+}
+
+/* Сообщение сервера (слева, зелёный) */
+.server {
+  background-color: #4CAF50;
+  color: white;
+  align-self: flex-start;
+  margin-right: auto;
+}
+
+/* Поля ввода */
+input[type="text"],
+input[type="number"] {
+  width: 100%;
+  max-width: 400px;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+/* Кнопка отправки в чате */
+#sendBtn {
+  background-color: #008080;
+  color: white;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#sendBtn:hover {
+  background-color: #00cccc;
+  transform: scale(1.05);
+}
+
 }
