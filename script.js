@@ -13,11 +13,11 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("Кнопка нажата");
 
     try {
-      const res = await fetch("https://learnback-twta.onrender.com", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ clicked: true })
-      });
+      const res = await fetch("https://learnback-twta.onrender.com/button-click", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ clicked: true })
+});
 
       const data = await res.json();
       responseEl.innerText = data.message;
