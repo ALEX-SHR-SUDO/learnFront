@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
       description: inputs.description.value.trim()
     };
 
-    // Выводим, что отправили
+    // выводим, что отправили
     const userMsg = document.createElement("div");
     userMsg.innerText = "Вы: " + JSON.stringify(payload);
     chatBox.appendChild(userMsg);
@@ -40,9 +40,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const data = await res.json();
 
-      const serverMsg = document.createElement("div");
-      serverMsg.innerText = "Сервер: " + JSON.stringify(data);
-      chatBox.appendChild(serverMsg);
+      // выводим каждый ответ построчно
+      Object.values(data).forEach(replyLine => {
+        const serverMsg = document.createElement("div");
+        serverMsg.innerText = "Сервер: " + replyLine;
+        chatBox.appendChild(serverMsg);
+      });
 
       chatBox.scrollTop = chatBox.scrollHeight;
     } catch (err) {
