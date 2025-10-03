@@ -1,29 +1,46 @@
 document.addEventListener("DOMContentLoaded", () => {
   console.log("JS загружен");
 
-  const button = document.getElementById("myButton");
-  const responseEl = document.getElementById("response");
+  const input = document.getElementById("chatInput");
+  const sendBtn = document.getElementById("sendBtn");
+  const chatBox = document.getElementById("chatBox");
 
-  if (!button || !responseEl) {
-    console.error("Элементы кнопки или response не найдены");
+  if (!input || !sendBtn || !chatBox) {
+    console.error("Элементы чата не найдены");
     return;
   }
 
-  button.addEventListener("click", async () => {
-    console.log("Кнопка нажата");
+  sendBtn.addEventListener("click", async () => {
+    const message = input.value.trim();
+    if (!message) return;
+
+    // выводим сообщение пользователя
+    const userMsg = document.createElement("div");
+    userMsg.innerText = "Вы: " + message;
+    chatBox.appendChild(userMsg);
+
+    input.value = "";
 
     try {
-      const res = await fetch("https://learnback-twta.onrender.com/button-click", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ clicked: true })
-});
+      const res = await fetch("https://learnback-twta.onrender.com/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message })
+      });
 
       const data = await res.json();
-      responseEl.innerText = data.message;
+
+      // выводим ответ сервера
+      const serverMsg = document.createElement("div");
+      serverMsg.innerText = "Сервер: " + data.reply;
+      chatBox.appendChild(serverMsg);
+
     } catch (err) {
       console.error(err);
-      responseEl.innerText = "Ошибка при обращении к серверу";
+      const errorMsg = document.createElement("div");
+      errorMsg.innerText = "Ошибка при обращении к серверу";
+      chatBox.appendChild(errorMsg);
     }
   });
 });
+
