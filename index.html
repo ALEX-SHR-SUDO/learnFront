@@ -14,11 +14,6 @@
     <p>Это абзац текста. Я могу писать здесь всё что угодно.</p>
     <a href="https://google.com" target="_blank">Перейти в Google</a>
     <br><br>
-
-    <!-- Кнопка для отправки запроса на backend -->
-    <button id="myButton">Solana</button>
-    <!-- Элемент для вывода ответа сервера -->
-    <p id="response"></p>
   </section>
 
   <section>
@@ -42,6 +37,14 @@
       <li>Молоко</li>
     </ul>
     <p>Я учусь <strong>HTML</strong> и это <em>интересно</em>!</p>
+  </section>
+
+  <!-- Новый блок для чата -->
+  <section>
+    <h2>Чат с сервером</h2>
+    <div id="chatBox" style="border:1px solid #ccc; padding:10px; width:300px; height:200px; overflow-y:auto;"></div>
+    <input id="chatInput" type="text" placeholder="Введите сообщение..." />
+    <button id="sendBtn">Отправить</button>
   </section>
 
   <!-- Скрипт подключаем в конце body -->
