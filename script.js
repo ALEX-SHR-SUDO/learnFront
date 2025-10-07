@@ -1,90 +1,50 @@
-document.addEventListener("DOMContentLoaded", () => {
-  console.log("JS загружен");
+console.log("✅ JS загружен");
 
-  const API = "https://learnback-twta.onrender.com"; // или свой backend URL
+document.getElementById("createBtn").addEventListener("click", async () => {
+  const name = document.getElementById("name").value.trim();
+  const symbol = document.getElementById("symbol").value.trim();
+  const decimals = document.getElementById("decimals").value.trim();
+  const supply = document.getElementById("supply").value.trim();
+  const description = document.getElementById("description").value.trim();
+  const logoFile = document.getElementById("logo").files[0];
 
-  const chatBox = document.getElementById("chatBox");
-  const sendBtn = document.getElementById("sendBtn");
-  const airdropBtn = document.getElementById("airdropBtn");
-  const balanceBtn = document.getElementById("balanceBtn");
-  const balanceOut = document.getElementById("balance");
-
-  const inputs = {
-    name: document.getElementById("nameInput"),
-    symbol: document.getElementById("symbolInput"),
-    decimals: document.getElementById("decimalsInput"),
-    supply: document.getElementById("supplyInput"),
-    description: document.getElementById("descriptionInput")
-  };
-
-  if (!chatBox || !sendBtn) {
-    console.error("Элементы формы не найдены");
+  if (!name || !symbol || !supply) {
+    alert("❗ Заполни name, symbol и supply");
     return;
   }
 
-  function addMessage(text, type = "server") {
-    const msg = document.createElement("div");
-    msg.classList.add("message", type);
-    msg.innerText = text;
-    chatBox.appendChild(msg);
-    chatBox.scrollTop = chatBox.scrollHeight;
+  const formData = new FormData();
+  formData.append("name", name);
+  formData.append("symbol", symbol);
+  formData.append("decimals", decimals);
+  formData.append("supply", supply);
+  formData.append("description", description);
+  if (logoFile) formData.append("logo", logoFile);
+
+  try {
+    document.getElementById("result").innerHTML = "⏳ Создание токена...";
+    const response = await fetch("https://learnback-twta.onrender.com/chat", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await response.json();
+    console.log("Ответ:", data);
+
+    if (data.error) {
+      document.getElementById("result").innerHTML = `❌ Ошибка: ${data.error}`;
+      return;
+    }
+
+    document.getElementById("result").innerHTML = `
+      ✅ <b>Токен создан!</b><br><br>
+      <b>Mint:</b> ${data.mint}<br><br>
+      <b>IPFS JSON:</b> <a href="${data.metadataUrl}" target="_blank">${data.metadataUrl}</a><br>
+      <b>Логотип:</b> <a href="${data.logoUrl}" target="_blank">${data.logoUrl}</a><br>
+      <b>Solscan:</b> <a href="${data.solscan}" target="_blank">${data.solscan}</a>
+    `;
+  } catch (err) {
+    console.error(err);
+    document.getElementById("result").innerHTML = `❌ Ошибка при запросе: ${err.message}`;
   }
-
-  // === Отправка токена ===
-  sendBtn.addEventListener("click", async () => {
-    const payload = {
-      name: inputs.name.value.trim(),
-      symbol: inputs.symbol.value.trim(),
-      decimals: inputs.decimals.value.trim(),
-      supply: inputs.supply.value.trim(),
-      description: inputs.description.value.trim()
-    };
-
-    addMessage(JSON.stringify(payload), "user");
-
-    try {
-      const res = await fetch(`${API}/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await res.json();
-
-      Object.values(data).forEach(replyLine => addMessage(replyLine, "server"));
-    } catch (err) {
-      console.error(err);
-      addMessage("Ошибка при обращении к серверу", "server");
-    }
-  });
-
-  // === Airdrop ===
-  airdropBtn.addEventListener("click", async () => {
-    addMessage("💸 Запрашиваю airdrop...", "user");
-    try {
-      const res = await fetch(`${API}/airdrop`, { method: "POST" });
-      const data = await res.json();
-      addMessage(data.message || "Airdrop выполнен!", "server");
-    } catch (err) {
-      console.error(err);
-      addMessage("❌ Ошибка при airdrop.", "server");
-    }
-  });
-
-  // === Проверка баланса ===
-  balanceBtn.addEventListener("click", async () => {
-    addMessage("🔍 Проверяем баланс...", "user");
-    balanceOut.innerText = "⏳ ...";
-    try {
-      const res = await fetch(`${API}/balance`);
-      const data = await res.json();
-      const sol = data.balance ?? 0;
-      addMessage(`Баланс сервисного кошелька: ${sol} SOL`, "server");
-      balanceOut.innerText = `${sol} SOL`;
-    } catch (err) {
-      console.error(err);
-      balanceOut.innerText = "❌ Ошибка";
-      addMessage("❌ Ошибка при проверке баланса.", "server");
-    }
-  });
 });
