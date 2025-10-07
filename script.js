@@ -1,50 +1,55 @@
-console.log("✅ JS загружен");
+const form = document.getElementById("tokenForm");
+const progressContainer = document.querySelector(".progress-container");
+const progressFill = document.getElementById("progressFill");
+const progressText = document.getElementById("progressText");
+const resultDiv = document.getElementById("result");
 
-document.getElementById("createBtn").addEventListener("click", async () => {
-  const name = document.getElementById("name").value.trim();
-  const symbol = document.getElementById("symbol").value.trim();
-  const decimals = document.getElementById("decimals").value.trim();
-  const supply = document.getElementById("supply").value.trim();
-  const description = document.getElementById("description").value.trim();
-  const logoFile = document.getElementById("logo").files[0];
-
-  if (!name || !symbol || !supply) {
-    alert("❗ Заполни name, symbol и supply");
-    return;
-  }
-
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  
   const formData = new FormData();
+  const name = document.getElementById("name").value;
+  const symbol = document.getElementById("symbol").value;
+  const decimals = document.getElementById("decimals").value || "9";
+  const supply = document.getElementById("supply").value;
+  const description = document.getElementById("description").value;
+  const logo = document.getElementById("logo").files[0];
+
   formData.append("name", name);
   formData.append("symbol", symbol);
   formData.append("decimals", decimals);
   formData.append("supply", supply);
   formData.append("description", description);
-  if (logoFile) formData.append("logo", logoFile);
+  if (logo) formData.append("logo", logo);
+
+  progressContainer.style.display = "block";
+  progressFill.style.width = "0%";
+  progressText.textContent = "Загрузка: 0%";
+  resultDiv.innerHTML = "";
 
   try {
-    document.getElementById("result").innerHTML = "⏳ Создание токена...";
     const response = await fetch("https://learnback-twta.onrender.com/chat", {
       method: "POST",
       body: formData,
     });
 
     const data = await response.json();
-    console.log("Ответ:", data);
 
-    if (data.error) {
-      document.getElementById("result").innerHTML = `❌ Ошибка: ${data.error}`;
-      return;
+    if (response.ok) {
+      progressFill.style.width = "100%";
+      progressText.textContent = "Загрузка: 100%";
+      resultDiv.innerHTML = `
+        ✅ Токен создан!<br>
+        Mint: ${data.mint}<br>
+        <a href="${data.metadataUrl}" target="_blank">IPFS Метаданные</a><br>
+        <a href="${data.logoUrl}" target="_blank">IPFS Логотип</a><br>
+        <a href="${data.solscan}" target="_blank">Solscan</a>
+      `;
+    } else {
+      resultDiv.textContent = "❌ Ошибка: " + data.error;
     }
-
-    document.getElementById("result").innerHTML = `
-      ✅ <b>Токен создан!</b><br><br>
-      <b>Mint:</b> ${data.mint}<br><br>
-      <b>IPFS JSON:</b> <a href="${data.metadataUrl}" target="_blank">${data.metadataUrl}</a><br>
-      <b>Логотип:</b> <a href="${data.logoUrl}" target="_blank">${data.logoUrl}</a><br>
-      <b>Solscan:</b> <a href="${data.solscan}" target="_blank">${data.solscan}</a>
-    `;
   } catch (err) {
     console.error(err);
-    document.getElementById("result").innerHTML = `❌ Ошибка при запросе: ${err.message}`;
+    resultDiv.textContent = "❌ Ошибка сети или CORS";
   }
 });
