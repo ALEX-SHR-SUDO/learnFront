@@ -2,34 +2,27 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Создание Solana токена</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Solana Token Creator</title>
+  <style>
+    body { font-family: Arial; padding: 20px; background: #f0f8ff; }
+    input, button { padding: 10px; margin: 5px 0; width: 100%; max-width: 400px; }
+    .message { padding: 10px; border-radius: 8px; margin: 5px 0; background: #dff0d8; }
+    a { color: blue; }
+  </style>
 </head>
 <body>
-  <section>
-    <h1>Создать Solana токен</h1>
-    <form id="tokenForm">
-      <input type="text" id="name" placeholder="Имя токена" required />
-      <input type="text" id="symbol" placeholder="Символ токена" required />
-      <input type="number" id="decimals" placeholder="Десятичные (по умолчанию 9)" />
-      <input type="number" id="supply" placeholder="Количество" required />
-      <input type="text" id="description" placeholder="Описание" />
-      <input type="file" id="logo" accept="image/*" />
-      <button type="submit">Создать токен</button>
-    </form>
+  <h1>Создать Solana Token</h1>
 
-    <div class="progress-container" style="display:none;">
-      <p id="progressText">Загрузка: 0%</p>
-      <div class="progress-bar">
-        <div id="progressFill"></div>
-      </div>
-    </div>
+  <input type="text" id="name" placeholder="Name">
+  <input type="text" id="symbol" placeholder="Symbol">
+  <input type="number" id="decimals" placeholder="Decimals (по умолчанию 9)">
+  <input type="number" id="supply" placeholder="Supply">
+  <input type="text" id="description" placeholder="Description">
+  <input type="file" id="logo">
+  <button id="createBtn">Создать токен</button>
 
-    <div id="result"></div>
-  </section>
+  <div id="messages"></div>
 
   <script src="script.js"></script>
 </body>
 </html>
-
