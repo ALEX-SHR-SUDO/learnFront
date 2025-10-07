@@ -1,14 +1,12 @@
 const chatBox = document.getElementById("chat");
-const btn = document.getElementById("createBtn");
-
-btn.addEventListener("click", async () => {
+document.getElementById("createBtn").addEventListener("click", async () => {
   const name = document.getElementById("name").value;
   const symbol = document.getElementById("symbol").value;
   const decimals = document.getElementById("decimals").value;
   const supply = document.getElementById("supply").value;
   const description = document.getElementById("description").value;
 
-  chatBox.innerHTML += `<div>Создаю токен...</div>`;
+  chatBox.innerHTML = "Создаю токен...";
 
   try {
     const res = await fetch("https://learnback-twta.onrender.com/chat", {
@@ -16,12 +14,15 @@ btn.addEventListener("click", async () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, symbol, decimals, supply, description })
     });
-    const data = await res.json();
 
-    chatBox.innerHTML += `<div>✅ ${data.message}</div>`;
-    chatBox.innerHTML += `<div>Mint: ${data.mint}</div>`;
-    chatBox.innerHTML += `<div><a href="${data.solscan}" target="_blank">Смотреть в Solscan</a></div>`;
+    const data = await res.json();
+    if (res.ok) {
+      chatBox.innerHTML = `✅ ${data.message}<br>Mint: ${data.mint}<br><a href="${data.solscan}" target="_blank">Solscan</a>`;
+    } else {
+      chatBox.innerHTML = `❌ Ошибка: ${data.error}<br>${data.details}`;
+    }
   } catch (err) {
-    chatBox.innerHTML += `<div>❌ Ошибка: ${err.message}</div>`;
+    chatBox.innerHTML = `❌ Ошибка: ${err.message}`;
   }
 });
+
