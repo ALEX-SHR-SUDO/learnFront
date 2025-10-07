@@ -1,20 +1,20 @@
-const form = document.getElementById("tokenForm");
-const progressContainer = document.querySelector(".progress-container");
-const progressFill = document.getElementById("progressFill");
-const progressText = document.getElementById("progressText");
-const resultDiv = document.getElementById("result");
+const btn = document.getElementById("createBtn");
+const messages = document.getElementById("messages");
 
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  
-  const formData = new FormData();
+btn.onclick = async () => {
   const name = document.getElementById("name").value;
   const symbol = document.getElementById("symbol").value;
-  const decimals = document.getElementById("decimals").value || "9";
+  const decimals = document.getElementById("decimals").value;
   const supply = document.getElementById("supply").value;
   const description = document.getElementById("description").value;
   const logo = document.getElementById("logo").files[0];
 
+  if (!name || !symbol || !supply) {
+    alert("Заполни name, symbol и supply");
+    return;
+  }
+
+  const formData = new FormData();
   formData.append("name", name);
   formData.append("symbol", symbol);
   formData.append("decimals", decimals);
@@ -22,34 +22,14 @@ form.addEventListener("submit", async (e) => {
   formData.append("description", description);
   if (logo) formData.append("logo", logo);
 
-  progressContainer.style.display = "block";
-  progressFill.style.width = "0%";
-  progressText.textContent = "Загрузка: 0%";
-  resultDiv.innerHTML = "";
-
   try {
-    const response = await fetch("https://learnback-twta.onrender.com/chat", {
+    const res = await fetch("https://learnback-twta.onrender.com/chat", {
       method: "POST",
-      body: formData,
+      body: formData
     });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      progressFill.style.width = "100%";
-      progressText.textContent = "Загрузка: 100%";
-      resultDiv.innerHTML = `
-        ✅ Токен создан!<br>
-        Mint: ${data.mint}<br>
-        <a href="${data.metadataUrl}" target="_blank">IPFS Метаданные</a><br>
-        <a href="${data.logoUrl}" target="_blank">IPFS Логотип</a><br>
-        <a href="${data.solscan}" target="_blank">Solscan</a>
-      `;
-    } else {
-      resultDiv.textContent = "❌ Ошибка: " + data.error;
-    }
+    const data = await res.json();
+    messages.innerHTML = `<div class="message"><pre>${JSON.stringify(data, null, 2)}</pre></div>`;
   } catch (err) {
-    console.error(err);
-    resultDiv.textContent = "❌ Ошибка сети или CORS";
+    messages.innerHTML = `<div class="message" style="background:#f8d7da;">Ошибка: ${err.message}</div>`;
   }
-});
+};
