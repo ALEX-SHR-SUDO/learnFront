@@ -1,65 +1,64 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Изучаю HTML</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <title>Создание токена Solana</title>
+  <link rel="icon" href="favicon.ico">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+    }
+    input, textarea, button {
+      width: 300px;
+      padding: 10px;
+      margin: 8px;
+      border-radius: 8px;
+      border: none;
+    }
+    input, textarea {
+      background: #1c1c1c;
+      color: #fff;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background: #0056d2;
+    }
+    #result {
+      margin-top: 20px;
+      background: #111;
+      padding: 20px;
+      border-radius: 10px;
+      width: 340px;
+      word-wrap: break-word;
+    }
+    a { color: #0bf; }
+  </style>
 </head>
-
 <body>
-  <section>
-    <h1>Мой первый сайт</h1>
-    <h2>Я учусь веб-разработке</h2>
-    <p>Это абзац текста. Я могу писать здесь всё что угодно.</p>
-    <a href="https://google.com" target="_blank">Перейти в Google</a>
-    <br><br>
-  </section>
+  <h1>Создание токена Solana</h1>
 
-  <section>
-    <img src="https://picsum.photos/300/200" alt="Картинка">
-  </section>
+  <input id="name" placeholder="Название токена">
+  <input id="symbol" placeholder="Символ (например, TKN)">
+  <input id="decimals" placeholder="Decimals (например, 9)" value="9">
+  <input id="supply" placeholder="Количество (например, 1000000)">
+  <textarea id="description" placeholder="Описание токена"></textarea>
+  <input type="file" id="logo" accept="image/*">
 
-  <section>
-    <h2>Мои фильмы</h2>
-    <ol>
-      <li>Матрица</li>
-      <li>Начало</li>
-      <li>Интерстеллар</li>
-    </ol>
-  </section>
+  <button id="createBtn">Создать токен</button>
 
-  <section>
-    <h2>Список покупок</h2>
-    <ul>
-      <li>Яблоки</li>
-      <li>Хлеб</li>
-      <li>Молоко</li>
-    </ul>
-    <p>Я учусь <strong>HTML</strong> и это <em>интересно</em>!</p>
-  </section>
+  <div id="result"></div>
 
-    <!-- Новый блок для чата -->
-  <section>
-    <h2>Создание токена</h2>
-
-    <div id="chatBox" class="chat-box"></div>
-
-    <input id="nameInput" type="text" placeholder="Name" /><br><br>
-    <input id="symbolInput" type="text" placeholder="Symbol" /><br><br>
-    <input id="decimalsInput" type="number" placeholder="Decimals" /><br><br>
-    <input id="supplyInput" type="number" placeholder="Supply" /><br><br>
-    <input id="descriptionInput" type="text" placeholder="Description" /><br><br>
-
-    <button id="sendBtn">Отправить</button>
-    <button id="airdropBtn">💸 Airdrop</button>
-    <button id="balanceBtn">💰 Проверить баланс</button>
-
-    <h3>Баланс сервиса:</h3>
-    <p id="balance">—</p>
-  </section>
-  
-  <!-- Скрипт подключаем в конце body -->
   <script src="script.js"></script>
 </body>
 </html>
