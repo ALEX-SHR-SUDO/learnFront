@@ -1,164 +1,56 @@
-/* === Общие стили (Dark Web3) === */
 body {
-  background: radial-gradient(circle at 20% 20%, #0d0d0f, #060608 80%);
-  color: #e0e0ff;
-  font-family: 'Inter', 'Segoe UI', sans-serif;
-  margin: 0;
-  padding: 30px;
-  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+  background: #f0f8ff;
+  padding: 20px;
 }
 
-/* Контейнеры */
 section {
-  background: rgba(20, 20, 30, 0.85);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(100, 100, 255, 0.2);
-  border-radius: 16px;
-  box-shadow: 0 0 25px rgba(100, 200, 255, 0.05);
-  padding: 25px;
-  margin: 20px auto;
-  max-width: 800px;
-  transition: all 0.3s ease;
+  background: #fff;
+  padding: 20px;
+  max-width: 500px;
+  margin: 30px auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-section:hover {
-  box-shadow: 0 0 35px rgba(120, 80, 255, 0.2);
-  transform: translateY(-3px);
-}
-
-/* Заголовки */
-h1 {
-  font-size: 2.5rem;
-  color: #a56cff;
-  text-align: center;
-  margin-bottom: 20px;
-  text-shadow: 0 0 10px rgba(165, 108, 255, 0.6);
-}
-
-h2 {
-  font-size: 1.6rem;
-  color: #5ce1e6;
+input, button {
+  width: 100%;
   margin-bottom: 10px;
-  text-shadow: 0 0 6px rgba(92, 225, 230, 0.5);
-}
-
-/* Абзацы */
-p {
-  font-size: 1.05rem;
-  color: #cfcfe6;
-  line-height: 1.6;
-}
-
-/* === Кнопки === */
-button {
-  display: inline-block;
-  padding: 10px 22px;
+  padding: 10px;
   font-size: 1rem;
-  background: linear-gradient(90deg, #a56cff, #5ce1e6);
-  border: none;
-  border-radius: 12px;
+}
+
+button {
+  background-color: #008080;
   color: #fff;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  box-shadow: 0 0 15px rgba(165, 108, 255, 0.4);
-  transition: all 0.25s ease-in-out;
-  margin-top: 10px;
+  transition: 0.3s;
 }
 
 button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 25px rgba(92, 225, 230, 0.6);
+  background-color: #00cccc;
 }
 
-/* === Поля ввода === */
-input[type="text"],
-input[type="number"],
-input[type="file"] {
+.progress-bar {
   width: 100%;
-  max-width: 400px;
-  padding: 10px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(150, 150, 255, 0.2);
+  height: 20px;
+  background: #ccc;
   border-radius: 10px;
-  color: #e8e8ff;
-  font-size: 1rem;
-  margin-bottom: 12px;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  margin-top: 5px;
 }
 
-input:focus {
-  outline: none;
-  border-color: #a56cff;
-  box-shadow: 0 0 10px rgba(165, 108, 255, 0.3);
+#progressFill {
+  height: 100%;
+  width: 0%;
+  background: #4caf50;
+  border-radius: 10px;
+  transition: width 0.3s ease;
 }
 
-/* === Чат-бокс === */
-.chat-box {
-  border: 1px solid rgba(92, 225, 230, 0.2);
-  border-radius: 12px;
-  background: rgba(15, 15, 25, 0.7);
-  backdrop-filter: blur(8px);
-  padding: 12px;
-  width: 100%;
-  max-width: 500px;
-  height: 250px;
-  overflow-y: auto;
-  margin: 20px auto;
-  display: flex;
-  flex-direction: column;
+#result {
+  margin-top: 15px;
+  word-break: break-word;
 }
 
-/* Сообщения */
-.message {
-  margin: 6px;
-  padding: 10px 14px;
-  border-radius: 12px;
-  max-width: 80%;
-  font-size: 0.95rem;
-  line-height: 1.4;
-}
-
-/* Пользователь */
-.user {
-  background: linear-gradient(135deg, #5ce1e6, #3a9ffb);
-  color: #000;
-  align-self: flex-end;
-  margin-left: auto;
-}
-
-/* Сервер */
-.server {
-  background: linear-gradient(135deg, #a56cff, #d66fff);
-  color: #fff;
-  align-self: flex-start;
-  margin-right: auto;
-}
-
-/* Ссылки */
-a {
-  color: #5ce1e6;
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-a:hover {
-  color: #a56cff;
-  text-shadow: 0 0 8px rgba(165, 108, 255, 0.7);
-}
-
-/* === Адаптивность === */
-@media (max-width: 768px) {
-  body {
-    padding: 15px;
-  }
-  section {
-    padding: 18px;
-  }
-  h1 {
-    font-size: 2rem;
-  }
-  h2 {
-    font-size: 1.3rem;
-  }
-}
