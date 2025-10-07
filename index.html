@@ -3,62 +3,83 @@
 <head>
   <meta charset="UTF-8">
   <title>Создание токена Solana</title>
-  <link rel="icon" href="favicon.ico">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0a0a0a;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 30px;
-    }
-    input, textarea, button {
-      width: 300px;
-      padding: 10px;
-      margin: 8px;
-      border-radius: 8px;
-      border: none;
-    }
-    input, textarea {
-      background: #1c1c1c;
-      color: #fff;
-    }
-    button {
-      background: #007bff;
-      color: white;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    button:hover {
-      background: #0056d2;
-    }
-    #result {
-      margin-top: 20px;
-      background: #111;
-      padding: 20px;
-      border-radius: 10px;
-      width: 340px;
-      word-wrap: break-word;
-    }
-    a { color: #0bf; }
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f0f8ff; }
+    input, button { display: block; margin: 10px 0; padding: 10px; font-size: 1rem; }
+    .chat-box { border: 1px solid #ccc; padding: 10px; width: 100%; max-width: 500px; height: 250px; overflow-y: auto; background: #fff; margin-bottom: 10px; border-radius: 10px; }
+    .message { margin: 5px; padding: 8px 12px; border-radius: 10px; max-width: 80%; word-wrap: break-word; font-size: 1rem; }
+    .user { background-color: #2196F3; color: white; align-self: flex-end; margin-left: auto; }
+    .server { background-color: #4CAF50; color: white; align-self: flex-start; margin-right: auto; }
   </style>
 </head>
 <body>
-  <h1>Создание токена Solana</h1>
+  <h1>Создать токен Solana с логотипом</h1>
 
-  <input id="name" placeholder="Название токена">
-  <input id="symbol" placeholder="Символ (например, TKN)">
-  <input id="decimals" placeholder="Decimals (например, 9)" value="9">
-  <input id="supply" placeholder="Количество (например, 1000000)">
-  <textarea id="description" placeholder="Описание токена"></textarea>
+  <div class="chat-box" id="chatBox"></div>
+
+  <input type="text" id="name" placeholder="Имя токена">
+  <input type="text" id="symbol" placeholder="Символ токена">
+  <input type="number" id="decimals" placeholder="Десятичные (например 9)">
+  <input type="number" id="supply" placeholder="Количество токенов">
+  <input type="text" id="description" placeholder="Описание токена">
   <input type="file" id="logo" accept="image/*">
-
   <button id="createBtn">Создать токен</button>
 
-  <div id="result"></div>
+  <script>
+    const chatBox = document.getElementById("chatBox");
+    const createBtn = document.getElementById("createBtn");
 
-  <script src="script.js"></script>
+    function addMessage(text, type="server") {
+      const div = document.createElement("div");
+      div.className = `message ${type}`;
+      div.textContent = text;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    createBtn.addEventListener("click", async () => {
+      const name = document.getElementById("name").value;
+      const symbol = document.getElementById("symbol").value;
+      const decimals = document.getElementById("decimals").value;
+      const supply = document.getElementById("supply").value;
+      const description = document.getElementById("description").value;
+      const logoFile = document.getElementById("logo").files[0];
+
+      if (!name || !symbol || !supply) {
+        addMessage("❗ Заполни name, symbol и supply", "server");
+        return;
+      }
+
+      addMessage("⏳ Отправка данных на сервер...", "user");
+
+      try {
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("symbol", symbol);
+        formData.append("decimals", decimals);
+        formData.append("supply", supply);
+        formData.append("description", description);
+        if (logoFile) formData.append("logo", logoFile);
+
+        const response = await fetch("https://learnback-twta.onrender.com/chat", {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          addMessage(`✅ ${data.message}`, "server");
+          addMessage(`Mint: ${data.mint}`, "server");
+          addMessage(`Solscan: ${data.solscan}`, "server");
+          if (data.logoUrl) addMessage(`Logo IPFS: ${data.logoUrl}`, "server");
+          if (data.metadataUrl) addMessage(`Metadata IPFS: ${data.metadataUrl}`, "server");
+        } else {
+          addMessage(`❌ Ошибка: ${data.error}`, "server");
+        }
+      } catch (err) {
+        addMessage(`❌ Сетевая ошибка: ${err.message}`, "server");
+      }
+    });
+  </script>
 </body>
 </html>
