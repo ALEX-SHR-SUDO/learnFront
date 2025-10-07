@@ -2,84 +2,34 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Создание токена Solana</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f0f8ff; }
-    input, button { display: block; margin: 10px 0; padding: 10px; font-size: 1rem; }
-    .chat-box { border: 1px solid #ccc; padding: 10px; width: 100%; max-width: 500px; height: 250px; overflow-y: auto; background: #fff; margin-bottom: 10px; border-radius: 10px; }
-    .message { margin: 5px; padding: 8px 12px; border-radius: 10px; max-width: 80%; word-wrap: break-word; font-size: 1rem; }
-    .user { background-color: #2196F3; color: white; align-self: flex-end; margin-left: auto; }
-    .server { background-color: #4CAF50; color: white; align-self: flex-start; margin-right: auto; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Создание Solana токена</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Создать токен Solana с логотипом</h1>
+  <section>
+    <h1>Создать Solana токен</h1>
+    <form id="tokenForm">
+      <input type="text" id="name" placeholder="Имя токена" required />
+      <input type="text" id="symbol" placeholder="Символ токена" required />
+      <input type="number" id="decimals" placeholder="Десятичные (по умолчанию 9)" />
+      <input type="number" id="supply" placeholder="Количество" required />
+      <input type="text" id="description" placeholder="Описание" />
+      <input type="file" id="logo" accept="image/*" />
+      <button type="submit">Создать токен</button>
+    </form>
 
-  <div class="chat-box" id="chatBox"></div>
+    <div class="progress-container" style="display:none;">
+      <p id="progressText">Загрузка: 0%</p>
+      <div class="progress-bar">
+        <div id="progressFill"></div>
+      </div>
+    </div>
 
-  <input type="text" id="name" placeholder="Имя токена">
-  <input type="text" id="symbol" placeholder="Символ токена">
-  <input type="number" id="decimals" placeholder="Десятичные (например 9)">
-  <input type="number" id="supply" placeholder="Количество токенов">
-  <input type="text" id="description" placeholder="Описание токена">
-  <input type="file" id="logo" accept="image/*">
-  <button id="createBtn">Создать токен</button>
+    <div id="result"></div>
+  </section>
 
-  <script>
-    const chatBox = document.getElementById("chatBox");
-    const createBtn = document.getElementById("createBtn");
-
-    function addMessage(text, type="server") {
-      const div = document.createElement("div");
-      div.className = `message ${type}`;
-      div.textContent = text;
-      chatBox.appendChild(div);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    createBtn.addEventListener("click", async () => {
-      const name = document.getElementById("name").value;
-      const symbol = document.getElementById("symbol").value;
-      const decimals = document.getElementById("decimals").value;
-      const supply = document.getElementById("supply").value;
-      const description = document.getElementById("description").value;
-      const logoFile = document.getElementById("logo").files[0];
-
-      if (!name || !symbol || !supply) {
-        addMessage("❗ Заполни name, symbol и supply", "server");
-        return;
-      }
-
-      addMessage("⏳ Отправка данных на сервер...", "user");
-
-      try {
-        const formData = new FormData();
-        formData.append("name", name);
-        formData.append("symbol", symbol);
-        formData.append("decimals", decimals);
-        formData.append("supply", supply);
-        formData.append("description", description);
-        if (logoFile) formData.append("logo", logoFile);
-
-        const response = await fetch("https://learnback-twta.onrender.com/chat", {
-          method: "POST",
-          body: formData
-        });
-
-        const data = await response.json();
-        if (response.ok) {
-          addMessage(`✅ ${data.message}`, "server");
-          addMessage(`Mint: ${data.mint}`, "server");
-          addMessage(`Solscan: ${data.solscan}`, "server");
-          if (data.logoUrl) addMessage(`Logo IPFS: ${data.logoUrl}`, "server");
-          if (data.metadataUrl) addMessage(`Metadata IPFS: ${data.metadataUrl}`, "server");
-        } else {
-          addMessage(`❌ Ошибка: ${data.error}`, "server");
-        }
-      } catch (err) {
-        addMessage(`❌ Сетевая ошибка: ${err.message}`, "server");
-      }
-    });
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
+
