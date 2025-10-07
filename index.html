@@ -1,70 +1,28 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Solana Token Creator</title>
-  <style>
-    body { font-family: Arial; padding: 20px; background: #f0f8ff; }
-    input, button { padding: 10px; margin: 5px 0; width: 100%; max-width: 400px; }
-    button { cursor: pointer; background: #008080; color: #fff; border: none; border-radius: 8px; }
-    button:hover { background: #00cccc; }
-    .output { margin-top: 20px; padding: 10px; background: #fff; border-radius: 10px; box-shadow: 0 0 5px #ccc; }
-    img { max-width: 200px; display: block; margin-top: 10px; border-radius: 8px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Создание токена Solana</title>
+<style>
+  body { font-family: Arial; background: #f0f8ff; padding: 20px; }
+  input, button { padding: 10px; margin: 5px 0; width: 100%; max-width: 400px; }
+  .chat-box { border: 1px solid #ccc; padding: 10px; max-width: 400px; margin-top: 10px; }
+</style>
 </head>
 <body>
 
-<h1>Создание Solana токена</h1>
+<h1>Создать токен на Solana</h1>
+<input type="text" id="name" placeholder="Name">
+<input type="text" id="symbol" placeholder="Symbol">
+<input type="number" id="decimals" placeholder="Decimals" value="9">
+<input type="number" id="supply" placeholder="Supply">
+<input type="text" id="description" placeholder="Description">
+<button id="createBtn">Создать токен</button>
 
-<form id="tokenForm">
-  <input type="text" name="name" placeholder="Название токена" required />
-  <input type="text" name="symbol" placeholder="Символ токена" required />
-  <input type="number" name="supply" placeholder="Количество токенов" required />
-  <input type="number" name="decimals" placeholder="Decimals (по умолчанию 9)" />
-  <input type="text" name="description" placeholder="Описание (необязательно)" />
-  <input type="file" name="logo" accept="image/*" />
-  <button type="submit">Создать токен</button>
-</form>
+<div class="chat-box" id="chat"></div>
 
-<div class="output" id="output"></div>
-
-<script>
-const form = document.getElementById("tokenForm");
-const output = document.getElementById("output");
-
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const formData = new FormData(form);
-  output.innerHTML = "⏳ Создаём токен... Подождите";
-
-  try {
-    const res = await fetch("https://learnback-twta.onrender.com/chat", {
-      method: "POST",
-      body: formData
-    });
-
-    const data = await res.json();
-
-    if (data.error) {
-      output.innerHTML = `❌ Ошибка: ${data.error}`;
-      return;
-    }
-
-    output.innerHTML = `
-      ✅ Токен создан!<br>
-      <strong>Mint:</strong> ${data.mint}<br>
-      <strong>Solscan:</strong> <a href="${data.solscan}" target="_blank">${data.solscan}</a><br>
-      ${data.logoUrl ? `<img src="${data.logoUrl}" alt="Logo" />` : ""}
-      <strong>Metadata URL:</strong> <a href="${data.metadataUrl}" target="_blank">${data.metadataUrl}</a>
-    `;
-  } catch (err) {
-    console.error(err);
-    output.innerHTML = `❌ Ошибка при запросе к серверу: ${err.message}`;
-  }
-});
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
+
