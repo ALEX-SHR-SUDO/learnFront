@@ -4,25 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Создание токена Solana</title>
-<style>
-  body { font-family: Arial; background: #f0f8ff; padding: 20px; }
-  input, button { padding: 10px; margin: 5px 0; width: 100%; max-width: 400px; }
-  .chat-box { border: 1px solid #ccc; padding: 10px; max-width: 400px; margin-top: 10px; }
-</style>
 </head>
 <body>
-
 <h1>Создать токен на Solana</h1>
-<input type="text" id="name" placeholder="Name">
-<input type="text" id="symbol" placeholder="Symbol">
-<input type="number" id="decimals" placeholder="Decimals" value="9">
-<input type="number" id="supply" placeholder="Supply">
-<input type="text" id="description" placeholder="Description">
+<input id="name" placeholder="Name"><br>
+<input id="symbol" placeholder="Symbol"><br>
+<input id="decimals" placeholder="Decimals" type="number" value="9"><br>
+<input id="supply" placeholder="Supply" type="number"><br>
+<input id="description" placeholder="Description"><br>
 <button id="createBtn">Создать токен</button>
 
-<div class="chat-box" id="chat"></div>
+<div id="chat" style="margin-top:20px;border:1px solid #ccc;padding:10px;max-width:400px;"></div>
 
 <script src="script.js"></script>
 </body>
 </html>
-
