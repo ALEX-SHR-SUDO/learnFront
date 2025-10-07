@@ -1,35 +1,27 @@
+const chatBox = document.getElementById("chat");
 const btn = document.getElementById("createBtn");
-const messages = document.getElementById("messages");
 
-btn.onclick = async () => {
+btn.addEventListener("click", async () => {
   const name = document.getElementById("name").value;
   const symbol = document.getElementById("symbol").value;
   const decimals = document.getElementById("decimals").value;
   const supply = document.getElementById("supply").value;
   const description = document.getElementById("description").value;
-  const logo = document.getElementById("logo").files[0];
 
-  if (!name || !symbol || !supply) {
-    alert("Заполни name, symbol и supply");
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append("name", name);
-  formData.append("symbol", symbol);
-  formData.append("decimals", decimals);
-  formData.append("supply", supply);
-  formData.append("description", description);
-  if (logo) formData.append("logo", logo);
+  chatBox.innerHTML += `<div>Создаю токен...</div>`;
 
   try {
     const res = await fetch("https://learnback-twta.onrender.com/chat", {
       method: "POST",
-      body: formData
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, symbol, decimals, supply, description })
     });
     const data = await res.json();
-    messages.innerHTML = `<div class="message"><pre>${JSON.stringify(data, null, 2)}</pre></div>`;
+
+    chatBox.innerHTML += `<div>✅ ${data.message}</div>`;
+    chatBox.innerHTML += `<div>Mint: ${data.mint}</div>`;
+    chatBox.innerHTML += `<div><a href="${data.solscan}" target="_blank">Смотреть в Solscan</a></div>`;
   } catch (err) {
-    messages.innerHTML = `<div class="message" style="background:#f8d7da;">Ошибка: ${err.message}</div>`;
+    chatBox.innerHTML += `<div>❌ Ошибка: ${err.message}</div>`;
   }
-};
+});
