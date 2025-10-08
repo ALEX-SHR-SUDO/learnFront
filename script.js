@@ -1,4 +1,4 @@
-const API_URL = "https://learnback-twta.onrender.com"; // ← твой backend
+const API_URL = "https://learnback-twta.onrender.com";
 
 const createBtn = document.getElementById('createBtn');
 const chat = document.getElementById('chat');
@@ -20,7 +20,7 @@ createBtn.addEventListener('click', async () => {
       })
     });
     const data = await response.json();
-    chat.innerHTML = `✅ Токен создан: <br><b>${data.mintAddress}</b>`;
+    chat.innerHTML = `✅ Токен создан: <br><b>${data.mint}</b>`;
   } catch (err) {
     chat.textContent = "❌ Ошибка при создании токена.";
   }
