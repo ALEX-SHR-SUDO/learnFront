@@ -1,28 +1,35 @@
-const chatBox = document.getElementById("chat");
-document.getElementById("createBtn").addEventListener("click", async () => {
-  const name = document.getElementById("name").value;
-  const symbol = document.getElementById("symbol").value;
-  const decimals = document.getElementById("decimals").value;
-  const supply = document.getElementById("supply").value;
-  const description = document.getElementById("description").value;
+const createBtn = document.getElementById('createBtn');
+const chat = document.getElementById('chat');
+const balanceDisplay = document.getElementById('balanceDisplay');
 
-  chatBox.innerHTML = "Создаю токен...";
-
+createBtn.addEventListener('click', async () => {
+  chat.innerHTML = "Создание токена...";
   try {
-    const res = await fetch("https://learnback-twta.onrender.com/chat", {
+    const response = await fetch("/api/create-token", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, symbol, decimals, supply, description })
+      body: JSON.stringify({
+        name: document.getElementById('name').value,
+        symbol: document.getElementById('symbol').value,
+        decimals: document.getElementById('decimals').value,
+        supply: document.getElementById('supply').value,
+        description: document.getElementById('description').value
+      })
     });
-
-    const data = await res.json();
-    if (res.ok) {
-      chatBox.innerHTML = `✅ ${data.message}<br>Mint: ${data.mint}<br><a href="${data.solscan}" target="_blank">Solscan</a>`;
-    } else {
-      chatBox.innerHTML = `❌ Ошибка: ${data.error}<br>${data.details}`;
-    }
+    const data = await response.json();
+    chat.innerHTML = `✅ Токен создан: <br> <b>${data.mintAddress}</b>`;
   } catch (err) {
-    chatBox.innerHTML = `❌ Ошибка: ${err.message}`;
+    chat.innerHTML = "❌ Ошибка при создании токена.";
   }
 });
 
+document.getElementById('getServerBalance').addEventListener('click', async () => {
+  balanceDisplay.textContent = "Загрузка...";
+  try {
+    const res = await fetch("/api/balance");
+    const data = await res.json();
+    balanceDisplay.textContent = `Баланс: ${data.balance} SOL`;
+  } catch {
+    balanceDisplay.textContent = "Ошибка: не удалось получить баланс";
+  }
+});
