@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const balanceInfo = document.getElementById("balanceInfo");
   const tokenList = document.getElementById("tokenList");
 
-  // Создать токен
+  // === Создать токен ===
   createBtn.addEventListener("click", async () => {
     const decimals = parseInt(document.getElementById("decimals").value);
     const supply = parseFloat(document.getElementById("supply").value);
@@ -31,13 +31,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Показать баланс и токены
+  // === Показать баланс и токены ===
   getBalanceBtn.addEventListener("click", async () => {
     balanceInfo.innerText = "Загрузка...";
     tokenList.innerText = "Загрузка...";
     try {
       const res = await fetch(`${BACKEND_URL}/api/balance`);
       const data = await res.json();
+
       balanceInfo.innerText = `💰 SOL: ${data.sol}`;
 
       if (!data.tokens || data.tokens.length === 0) {
@@ -46,4 +47,17 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       tokenList.innerHTML = data.tokens
-        .map(t => `<div class="token-card"><div>${t.mint}</div><div>${t
+        .map(
+          t =>
+            `<div class="token-card">
+               <div>${t.mint}</div>
+               <div>${t.amount}</div>
+             </div>`
+        )
+        .join("");
+    } catch (err) {
+      balanceInfo.innerText = "❌ Ошибка: " + err.message;
+      tokenList.innerText = "❌ Ошибка: " + err.message;
+    }
+  });
+});
