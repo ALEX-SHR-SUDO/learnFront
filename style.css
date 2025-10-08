@@ -1,115 +1,85 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
-
 body {
-  background: radial-gradient(circle at top, #0a0e1a 0%, #05070d 100%);
-  color: #e5e7eb;
-  font-family: 'Inter', sans-serif;
+  background-color: #0b0e17;
+  font-family: "Inter", sans-serif;
+  color: #e0ffe0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40px 20px;
-  min-height: 100vh;
+  padding: 40px;
 }
 
-/* Основные блоки */
-.container, .balance-section {
-  background: rgba(10, 20, 40, 0.9);
-  border: 2px solid rgba(0, 255, 127, 0.4);
-  box-shadow: 0 0 35px rgba(0, 255, 127, 0.2);
-  border-radius: 12px;
-  padding: 32px;
-  width: 400px;
-  margin-bottom: 30px;
-  transition: box-shadow 0.3s;
-}
-
-.container:hover,
-.balance-section:hover {
-  box-shadow: 0 0 45px rgba(0, 255, 127, 0.5);
-}
-
-/* Заголовки */
-h1, h2 {
+.container {
+  background: #10234a;
+  border: 2px solid #00ff99;
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 0 30px rgba(0, 255, 150, 0.2);
+  max-width: 400px;
+  width: 100%;
   text-align: center;
-  color: #00ff7f;
-  margin-bottom: 20px;
-  font-weight: 600;
 }
 
-/* Поля ввода */
+h1, h2 {
+  color: #00ffcc;
+  text-shadow: 0 0 10px #00ffcc;
+}
+
 input, textarea {
   width: 100%;
-  background: #0b1020;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 8px 0;
+  padding: 10px;
+  border: 1px solid #00ff99;
+  background-color: #081830;
+  color: #e0ffe0;
   border-radius: 8px;
-  color: #e5e7eb;
-  padding: 12px;
-  font-size: 14px;
-  margin-bottom: 14px;
-  transition: border 0.2s, box-shadow 0.2s;
-}
-
-input:focus, textarea:focus {
-  border: 1px solid #00ff7f;
-  box-shadow: 0 0 6px rgba(0, 255, 127, 0.4);
   outline: none;
 }
 
-/* Кнопки */
+input:focus, textarea:focus {
+  box-shadow: 0 0 10px #00ff99;
+}
+
 button {
-  width: 100%;
-  background: linear-gradient(90deg, #00ff7f 0%, #00e8a0 100%);
-  color: #0d0f14;
+  background-color: #00ff99;
+  color: #001a1a;
+  font-weight: bold;
   border: none;
   border-radius: 8px;
-  font-size: 15px;
-  padding: 12px;
-  font-weight: 600;
+  padding: 10px 20px;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.3s;
-  margin-top: 8px;
+  margin-top: 10px;
+  transition: 0.3s;
 }
 
 button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 20px rgba(0, 255, 127, 0.5);
+  background-color: #00ffaa;
+  box-shadow: 0 0 10px #00ff99;
 }
 
-/* Чат и баланс */
-#chat, #balanceDisplay, #connectionStatus {
-  margin-top: 20px;
-  background: #0b1020;
-  border-radius: 8px;
-  padding: 14px;
-  color: #9ca3af;
+.balance-section {
+  background: #10234a;
+  border: 2px solid #00ffcc;
+  border-radius: 16px;
+  padding: 20px;
+  margin-top: 25px;
+  box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
+  max-width: 400px;
+  width: 100%;
   text-align: center;
-  border: 1px solid rgba(0, 255, 127, 0.2);
 }
 
-/* Секция токенов */
-#tokenDisplay {
-  margin-top: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+#chat, #balanceDisplay, #tokenDisplay {
+  margin-top: 10px;
+  color: #b3ffec;
 }
 
 .token-card {
-  background: rgba(0, 255, 127, 0.1);
-  border: 1px solid #00ff7f;
-  border-radius: 10px;
-  padding: 10px;
-  color: #e5e7eb;
+  background: #081830;
+  border: 1px solid #00ff99;
+  padding: 8px;
+  margin: 5px 0;
+  border-radius: 8px;
   display: flex;
   justify-content: space-between;
-  transition: transform 0.2s, box-shadow 0.3s;
-}
-
-.token-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 15px rgba(0, 255, 127, 0.6);
-}
-
-.token-card b {
-  color: #00ff7f;
+  color: #00ffcc;
 }
