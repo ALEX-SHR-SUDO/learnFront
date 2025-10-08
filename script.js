@@ -21,7 +21,11 @@ createBtn.addEventListener('click', async () => {
       })
     });
     const data = await response.json();
-    chat.innerHTML = `✅ Токен создан: <br><b>${data.mint}</b>`;
+    if(data.mint){
+      chat.innerHTML = `✅ Токен создан: <br><b>${data.mint}</b>`;
+    } else {
+      chat.textContent = `❌ Ошибка: ${data.error}`;
+    }
   } catch (err) {
     chat.textContent = "❌ Ошибка при создании токена.";
   }
@@ -48,8 +52,11 @@ document.getElementById('getServerTokens').addEventListener('click', async () =>
       return;
     }
     tokenDisplay.innerHTML = data.tokens.map(t =>
-      `<b>Mint:</b> ${t.mint} | <b>Баланс:</b> ${t.amount}`
-    ).join("<br>");
+      `<div class="token-card">
+         <span><b>Mint:</b> ${t.mint}</span>
+         <span><b>Баланс:</b> ${t.amount}</span>
+       </div>`
+    ).join("");
   } catch {
     tokenDisplay.textContent = "Ошибка: не удалось получить токены";
   }
@@ -65,3 +72,4 @@ document.getElementById('testConnection').addEventListener('click', async () => 
     connectionStatus.textContent = "❌ Ошибка соединения с backend";
   }
 });
+
