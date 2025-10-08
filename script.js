@@ -1,3 +1,4 @@
+document.addEventListener("DOMContentLoaded", () => {
 const API_URL = "https://learnback-twta.onrender.com";
 
 // элементы DOM
