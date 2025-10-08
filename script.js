@@ -3,6 +3,7 @@ const API_URL = "https://learnback-twta.onrender.com";
 const createBtn = document.getElementById('createBtn');
 const chat = document.getElementById('chat');
 const balanceDisplay = document.getElementById('balanceDisplay');
+const tokenDisplay = document.getElementById('tokenDisplay');
 const connectionStatus = document.getElementById('connectionStatus');
 
 createBtn.addEventListener('click', async () => {
@@ -34,6 +35,23 @@ document.getElementById('getServerBalance').addEventListener('click', async () =
     balanceDisplay.textContent = `Баланс: ${data.balance} SOL`;
   } catch {
     balanceDisplay.textContent = "Ошибка: не удалось получить баланс";
+  }
+});
+
+document.getElementById('getServerTokens').addEventListener('click', async () => {
+  tokenDisplay.textContent = "Загрузка...";
+  try {
+    const res = await fetch(`${API_URL}/api/tokens`);
+    const data = await res.json();
+    if (data.tokens.length === 0) {
+      tokenDisplay.textContent = "Токенов нет";
+      return;
+    }
+    tokenDisplay.innerHTML = data.tokens.map(t =>
+      `<b>Mint:</b> ${t.mint} | <b>Баланс:</b> ${t.amount}`
+    ).join("<br>");
+  } catch {
+    tokenDisplay.textContent = "Ошибка: не удалось получить токены";
   }
 });
 
