@@ -1,56 +1,87 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
 body {
-  font-family: Arial, sans-serif;
-  background: #f0f8ff;
-  padding: 20px;
+  background: radial-gradient(circle at top, #0a0e1a 0%, #05070d 100%);
+  color: #e5e7eb;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 50px 20px;
+  min-height: 100vh;
 }
 
-section {
-  background: #fff;
-  padding: 20px;
-  max-width: 500px;
-  margin: 30px auto;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+/* Основная форма */
+.container, .balance-section {
+  background: rgba(10, 20, 40, 0.9);
+  border: 2px solid rgba(0, 136, 255, 0.4);
+  box-shadow: 0 0 35px rgba(0, 136, 255, 0.2);
+  border-radius: 12px;
+  padding: 32px;
+  width: 380px;
+  margin-bottom: 40px;
+  transition: box-shadow 0.3s;
 }
 
-input, button {
+.container:hover,
+.balance-section:hover {
+  box-shadow: 0 0 45px rgba(0, 136, 255, 0.4);
+}
+
+/* Заголовки */
+h1, h2 {
+  text-align: center;
+  color: #33aaff;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+/* Поля ввода */
+input, textarea {
   width: 100%;
-  margin-bottom: 10px;
-  padding: 10px;
-  font-size: 1rem;
+  background: #0b1020;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #e5e7eb;
+  padding: 12px;
+  font-size: 14px;
+  margin-bottom: 14px;
+  transition: border 0.2s, box-shadow 0.2s;
 }
 
+input:focus, textarea:focus {
+  border: 1px solid #33aaff;
+  box-shadow: 0 0 6px rgba(51, 170, 255, 0.4);
+  outline: none;
+}
+
+/* Кнопки */
 button {
-  background-color: #008080;
-  color: #fff;
+  width: 100%;
+  background: linear-gradient(90deg, #0088ff 0%, #33ccff 100%);
+  color: #ffffff;
   border: none;
   border-radius: 8px;
+  font-size: 15px;
+  padding: 12px;
+  font-weight: 600;
   cursor: pointer;
-  transition: 0.3s;
+  transition: transform 0.2s, box-shadow 0.3s;
 }
 
 button:hover {
-  background-color: #00cccc;
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(51, 170, 255, 0.5);
 }
 
-.progress-bar {
-  width: 100%;
-  height: 20px;
-  background: #ccc;
-  border-radius: 10px;
-  margin-top: 5px;
-}
-
-#progressFill {
-  height: 100%;
-  width: 0%;
-  background: #4caf50;
-  border-radius: 10px;
-  transition: width 0.3s ease;
-}
-
-#result {
-  margin-top: 15px;
-  word-break: break-word;
+/* Чат и баланс */
+#chat, #balanceDisplay {
+  margin-top: 20px;
+  background: #0b1020;
+  border-radius: 8px;
+  padding: 14px;
+  color: #9ca3af;
+  text-align: center;
+  border: 1px solid rgba(51, 170, 255, 0.2);
 }
 
