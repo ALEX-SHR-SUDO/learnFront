@@ -1,21 +1,120 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Создание токена Solana</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Создание токена Solana</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+    body {
+      background: radial-gradient(circle at top, #111319 0%, #0a0c10 100%);
+      color: #e5e7eb;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 50px 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: rgba(20, 22, 28, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 30px rgba(0, 255, 163, 0.08);
+      border-radius: 16px;
+      padding: 32px;
+      width: 380px;
+      backdrop-filter: blur(10px);
+      transition: 0.3s;
+    }
+
+    .container:hover {
+      box-shadow: 0 0 35px rgba(0, 255, 163, 0.15);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.6rem;
+      color: #00ffa3;
+      margin-bottom: 24px;
+      font-weight: 600;
+    }
+
+    input, textarea {
+      width: 100%;
+      background: #0f1117;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      color: #e5e7eb;
+      padding: 12px;
+      font-size: 14px;
+      margin-bottom: 14px;
+      transition: border 0.2s;
+    }
+
+    input:focus, textarea:focus {
+      border: 1px solid #00ffa3;
+      outline: none;
+      box-shadow: 0 0 6px rgba(0, 255, 163, 0.3);
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #6b7280;
+    }
+
+    button {
+      width: 100%;
+      background: linear-gradient(90deg, #00ffa3 0%, #00e1ff 100%);
+      color: #0d0f14;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      padding: 12px;
+      margin-top: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.3s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 15px rgba(0, 255, 163, 0.3);
+    }
+
+    #chat {
+      margin-top: 24px;
+      background: #0f1117;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 14px;
+      color: #9ca3af;
+      max-height: 200px;
+      overflow-y: auto;
+      font-size: 14px;
+    }
+  </style>
 </head>
 <body>
-<h1>Создать токен на Solana</h1>
-<input id="name" placeholder="Name"><br>
-<input id="symbol" placeholder="Symbol"><br>
-<input id="decimals" placeholder="Decimals" type="number" value="9"><br>
-<input id="supply" placeholder="Supply" type="number"><br>
-<input id="description" placeholder="Description"><br>
-<button id="createBtn">Создать токен</button>
+  <div class="container">
+    <h1>Создать токен на Solana</h1>
+    <input id="name" placeholder="Name" />
+    <input id="symbol" placeholder="Symbol" />
+    <input id="decimals" placeholder="Decimals" type="number" value="9" />
+    <input id="supply" placeholder="Supply" type="number" />
+    <textarea id="description" placeholder="Description"></textarea>
+    <button id="createBtn">Создать токен</button>
+    <div id="chat"></div>
+  </div>
 
-<div id="chat" style="margin-top:20px;border:1px solid #ccc;padding:10px;max-width:400px;"></div>
-
-<script src="script.js"></script>
+  <script>
+    const btn = document.getElementById('createBtn');
+    btn.addEventListener('click', () => {
+      const chat = document.getElementById('chat');
+      chat.innerHTML = "<p>⏳ Создаём токен... пожалуйста, подождите.</p>";
+      // Здесь можно добавить код для взаимодействия с Solana backend
+    });
+  </script>
 </body>
 </html>
