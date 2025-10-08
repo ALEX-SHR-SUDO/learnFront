@@ -3,32 +3,28 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Создание токена + Баланс</title>
+<title>Solana Token Manager</title>
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<div class="container">
-  <h1>Создать токен на Solana</h1>
-  <input id="name" placeholder="Name" />
-  <input id="symbol" placeholder="Symbol" />
-  <input id="decimals" placeholder="Decimals" type="number" value="9" />
-  <input id="supply" placeholder="Supply" type="number" />
-  <textarea id="description" placeholder="Description"></textarea>
-  <button id="createBtn">Создать токен</button>
-  <div id="chat">Статус: —</div>
-</div>
+<div class="main-container">
+  <!-- Левая колонка -->
+  <div class="left-panel">
+    <h2>Создать токен</h2>
+    <input id="decimals" type="number" value="9" />
+    <input id="supply" type="number" placeholder="Supply" />
+    <button id="createBtn">Создать токен</button>
+    <div id="tokenInfo">Токен: —</div>
+  </div>
 
-<div class="balance-section">
-  <h2>Баланс SOL</h2>
-  <input id="walletAddress" placeholder="Введите адрес кошелька" />
-  <button id="getBalanceBtn">Показать SOL</button>
-  <div id="balanceDisplay">Баланс: —</div>
-</div>
-
-<div class="balance-section">
-  <h2>Токены кошелька</h2>
-  <button id="getTokensBtn">Показать токены</button>
-  <div id="tokenDisplay">Токены: —</div>
+  <!-- Правая колонка -->
+  <div class="right-panel">
+    <h2>Сервисный кошелек</h2>
+    <button id="getBalanceBtn">Показать баланс</button>
+    <div id="balanceInfo">Баланс: —</div>
+    <h3>Токены</h3>
+    <div id="tokenList">—</div>
+  </div>
 </div>
 
 <script src="script.js"></script>
