@@ -1,112 +1,77 @@
-const API_URL = "https://learnback-twta.onrender.com";
+document.addEventListener("DOMContentLoaded", () => {
+  const BACKEND_URL = "https://learnback-twta.onrender.com";
 
-// элементы DOM
-const createBtn = document.getElementById("createBtn");
-const nameInput = document.getElementById("name");
-const symbolInput = document.getElementById("symbol");
-const decimalsInput = document.getElementById("decimals");
-const supplyInput = document.getElementById("supply");
-const descriptionInput = document.getElementById("description");
+  const createBtn = document.getElementById("createBtn");
+  const getBalanceBtn = document.getElementById("getBalanceBtn");
+  const getTokensBtn = document.getElementById("getTokensBtn");
 
-const chatDiv = document.getElementById("chat");
-const balanceDisplay = document.getElementById("balanceDisplay");
-const tokenDisplay = document.getElementById("tokenDisplay");
-const walletInput = document.getElementById("walletAddress");
-const balanceBtn = document.getElementById("checkBalanceBtn");
-const connectionStatus = document.getElementById("connectionStatus");
+  // === Создание токена ===
+  createBtn.addEventListener("click", async () => {
+    const name = document.getElementById("name").value;
+    const symbol = document.getElementById("symbol").value;
+    const decimals = parseInt(document.getElementById("decimals").value);
+    const supply = parseFloat(document.getElementById("supply").value);
+    const description = document.getElementById("description").value;
 
-// ===== Проверка соединения с backend =====
-async function checkConnection() {
-  try {
-    const res = await fetch(`${API_URL}/api/ping`);
-    const data = await res.json();
-    if (data.ok) {
-      connectionStatus.innerHTML = `🟢 Соединение с backend успешно`;
-    } else {
-      connectionStatus.innerHTML = `🔴 Ошибка соединения`;
+    const chat = document.getElementById("chat");
+    chat.innerText = "Создаю токен...";
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/create-token`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, symbol, decimals, supply, description })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || JSON.stringify(data));
+
+      chat.innerText = `✅ Токен создан: ${data.mint}`;
+    } catch (err) {
+      chat.innerText = "❌ Ошибка: " + err.message;
     }
-  } catch (err) {
-    connectionStatus.innerHTML = `🔴 Ошибка: backend недоступен`;
-  }
-}
-checkConnection();
+  });
 
-// ===== Создание токена =====
-createBtn.addEventListener("click", async () => {
-  const name = nameInput.value.trim();
-  const symbol = symbolInput.value.trim();
-  const decimals = decimalsInput.value.trim();
-  const supply = supplyInput.value.trim();
-  const description = descriptionInput.value.trim();
+  // === Показать баланс SOL ===
+  getBalanceBtn.addEventListener("click", async () => {
+    const walletAddress = document.getElementById("walletAddress").value;
+    const balanceDisplay = document.getElementById("balanceDisplay");
+    if (!walletAddress) return alert("Введите адрес кошелька!");
 
-  if (!name || !symbol || !supply) {
-    chatDiv.innerHTML = "❗ Заполни все обязательные поля (Name, Symbol, Supply)";
-    return;
-  }
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/balance/${walletAddress}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || JSON.stringify(data));
 
-  chatDiv.innerHTML = "⏳ Создание токена...";
-
-  try {
-    const res = await fetch(`${API_URL}/api/create-token`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, symbol, decimals, supply, description })
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-      chatDiv.innerHTML = `
-        ✅ <b>${data.message}</b><br><br>
-        <b>Mint:</b> ${data.mint}<br>
-        <a href="${data.solscan}" target="_blank" style="color:#00ff7f;">Открыть в Solscan</a>
-      `;
-    } else {
-      chatDiv.innerHTML = `❌ Ошибка: ${data.error || "Неизвестная"}`;
+      balanceDisplay.innerText = `💰 SOL: ${data.sol}`;
+    } catch (err) {
+      balanceDisplay.innerText = "❌ Ошибка: " + err.message;
     }
-  } catch (err) {
-    chatDiv.innerHTML = `⚠️ Ошибка сети: ${err.message}`;
-  }
-});
+  });
 
-// ===== Проверка баланса кошелька =====
-balanceBtn.addEventListener("click", async () => {
-  const address = walletInput.value.trim();
-  if (!address) {
-    balanceDisplay.innerHTML = "❗ Введи адрес кошелька";
-    return;
-  }
+  // === Показать токены ===
+  getTokensBtn.addEventListener("click", async () => {
+    const walletAddress = document.getElementById("walletAddress").value;
+    const tokenDisplay = document.getElementById("tokenDisplay");
+    if (!walletAddress) return alert("Введите адрес кошелька!");
 
-  balanceDisplay.innerHTML = "⏳ Получаем баланс...";
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/balance/${walletAddress}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || JSON.stringify(data));
 
-  try {
-    const res = await fetch(`${API_URL}/api/balance/${address}`);
-    const data = await res.json();
+      if (!data.tokens || data.tokens.length === 0) {
+        tokenDisplay.innerText = "Нет токенов";
+        return;
+      }
 
-    if (!res.ok) {
-      balanceDisplay.innerHTML = `❌ Ошибка: ${data.error}`;
-      return;
-    }
-
-    balanceDisplay.innerHTML = `
-      💰 <b>SOL:</b> ${data.sol.toFixed(4)}<br>
-      🪙 <b>Токены:</b>
-    `;
-
-    if (data.tokens.length === 0) {
-      tokenDisplay.innerHTML = `<div class="token-card">Нет токенов</div>`;
-    } else {
       tokenDisplay.innerHTML = data.tokens
         .map(
-          (t) => `
-          <div class="token-card">
-            <span><b>Mint:</b> ${t.mint}</span>
-            <span><b>Баланс:</b> ${t.amount}</span>
-          </div>`
+          t => `<div class="token-card"><div>${t.mint}</div><div>${t.amount}</div></div>`
         )
         .join("");
+    } catch (err) {
+      tokenDisplay.innerText = "❌ Ошибка: " + err.message;
     }
-  } catch (err) {
-    balanceDisplay.innerHTML = `⚠️ Ошибка при получении баланса: ${err.message}`;
-  }
+  });
 });
