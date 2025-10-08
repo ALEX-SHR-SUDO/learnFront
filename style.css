@@ -14,8 +14,8 @@ body {
 /* Основная форма */
 .container, .balance-section {
   background: rgba(10, 20, 40, 0.9);
-  border: 2px solid rgba(0, 136, 255, 0.4);
-  box-shadow: 0 0 35px rgba(0, 136, 255, 0.2);
+  border: 2px solid rgba(0, 255, 127, 0.4);
+  box-shadow: 0 0 35px rgba(0, 255, 127, 0.2);
   border-radius: 12px;
   padding: 32px;
   width: 380px;
@@ -25,13 +25,13 @@ body {
 
 .container:hover,
 .balance-section:hover {
-  box-shadow: 0 0 45px rgba(0, 136, 255, 0.4);
+  box-shadow: 0 0 45px rgba(0, 255, 127, 0.4);
 }
 
 /* Заголовки */
 h1, h2 {
   text-align: center;
-  color: #33aaff;
+  color: #00ff7f;
   margin-bottom: 20px;
   font-weight: 600;
 }
@@ -50,16 +50,16 @@ input, textarea {
 }
 
 input:focus, textarea:focus {
-  border: 1px solid #33aaff;
-  box-shadow: 0 0 6px rgba(51, 170, 255, 0.4);
+  border: 1px solid #00ff7f;
+  box-shadow: 0 0 6px rgba(0, 255, 127, 0.4);
   outline: none;
 }
 
 /* Кнопки */
 button {
   width: 100%;
-  background: linear-gradient(90deg, #0088ff 0%, #33ccff 100%);
-  color: #ffffff;
+  background: linear-gradient(90deg, #00ff7f 0%, #00e8a0 100%);
+  color: #0d0f14;
   border: none;
   border-radius: 8px;
   font-size: 15px;
@@ -67,21 +67,21 @@ button {
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.3s;
+  margin-top: 8px;
 }
 
 button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 0 20px rgba(51, 170, 255, 0.5);
+  box-shadow: 0 0 20px rgba(0, 255, 127, 0.5);
 }
 
 /* Чат и баланс */
-#chat, #balanceDisplay {
+#chat, #balanceDisplay, #connectionStatus {
   margin-top: 20px;
   background: #0b1020;
   border-radius: 8px;
   padding: 14px;
   color: #9ca3af;
   text-align: center;
-  border: 1px solid rgba(51, 170, 255, 0.2);
+  border: 1px solid rgba(0, 255, 127, 0.2);
 }
-
