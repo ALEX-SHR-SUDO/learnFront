@@ -7,7 +7,6 @@
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
 <div class="container">
   <h1>Создать токен на Solana</h1>
   <input id="name" placeholder="Name" />
@@ -21,19 +20,15 @@
 
 <div class="balance-section">
   <h2>Баланс SOL</h2>
-  <button id="getServerBalance">Показать SOL</button>
+  <input id="walletAddress" placeholder="Введите адрес кошелька" />
+  <button id="getBalanceBtn">Показать SOL</button>
   <div id="balanceDisplay">Баланс: —</div>
 </div>
 
 <div class="balance-section">
   <h2>Токены кошелька</h2>
-  <button id="getServerTokens">Показать токены</button>
+  <button id="getTokensBtn">Показать токены</button>
   <div id="tokenDisplay">Токены: —</div>
-</div>
-
-<div class="balance-section">
-  <button id="testConnection">Проверить соединение с backend</button>
-  <div id="connectionStatus">Статус: —</div>
 </div>
 
 <script src="script.js"></script>
