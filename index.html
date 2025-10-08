@@ -1,80 +1,14 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Создание токена + Баланс сервера</title>
-<style>
-  body {
-    background: radial-gradient(circle at top, #111319 0%, #0a0c10 100%);
-    color: #e5e7eb;
-    font-family: 'Inter', sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 50px 20px;
-    min-height: 100vh;
-  }
-
-  .container, .balance-section {
-    background: rgba(20, 22, 28, 0.9);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 0 30px rgba(0, 255, 0, 0.08);
-    border-radius: 16px;
-    padding: 32px;
-    width: 380px;
-    backdrop-filter: blur(10px);
-    margin-bottom: 40px;
-  }
-
-  h1, h2 {
-    text-align: center;
-    color: #00ff7f;
-  }
-
-  input, textarea {
-    width: 100%;
-    background: #0f1117;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 10px;
-    color: #e5e7eb;
-    padding: 12px;
-    font-size: 14px;
-    margin-bottom: 14px;
-  }
-
-  button {
-    width: 100%;
-    background: linear-gradient(90deg, #00ff7f 0%, #00e8a0 100%);
-    color: #0d0f14;
-    border: none;
-    border-radius: 10px;
-    font-size: 15px;
-    padding: 12px;
-    margin-top: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.3s;
-  }
-
-  button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 15px rgba(0, 255, 127, 0.3);
-  }
-
-  #chat, #balanceDisplay {
-    margin-top: 20px;
-    background: #0f1117;
-    border-radius: 10px;
-    padding: 14px;
-    color: #9ca3af;
-    text-align: center;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Создание токена + Баланс</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <h1>Создать токен</h1>
+    <h1>Создать токен на Solana</h1>
     <input id="name" placeholder="Name" />
     <input id="symbol" placeholder="Symbol" />
     <input id="decimals" placeholder="Decimals" type="number" value="9" />
@@ -85,47 +19,11 @@
   </div>
 
   <div class="balance-section">
-    <h2>Баланс серверного кошелька</h2>
+    <h2>Баланс кошелька</h2>
     <button id="getServerBalance">Показать баланс</button>
     <div id="balanceDisplay">Баланс: —</div>
   </div>
 
-<script>
-  const createBtn = document.getElementById('createBtn');
-  const chat = document.getElementById('chat');
-  const balanceDisplay = document.getElementById('balanceDisplay');
-
-  createBtn.addEventListener('click', async () => {
-    chat.innerHTML = "Создание токена...";
-    try {
-      const response = await fetch("https://learnback-twta.onrender.com/api/create-token", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: document.getElementById('name').value,
-          symbol: document.getElementById('symbol').value,
-          decimals: document.getElementById('decimals').value,
-          supply: document.getElementById('supply').value,
-          description: document.getElementById('description').value
-        })
-      });
-      const data = await response.json();
-      chat.innerHTML = `✅ Токен создан: <br> <b>${data.mintAddress}</b>`;
-    } catch (err) {
-      chat.innerHTML = "Ошибка при создании токена.";
-    }
-  });
-
-  document.getElementById('getServerBalance').addEventListener('click', async () => {
-    balanceDisplay.textContent = "Загрузка...";
-    try {
-      const res = await fetch("https://learnback-twta.onrender.com/api/balance");
-      const data = await res.json();
-      balanceDisplay.textContent = `Баланс: ${data.balance} SOL`;
-    } catch {
-      balanceDisplay.textContent = "Ошибка: не удалось получить баланс";
-    }
-  });
-</script>
+  <script src="script.js"></script>
 </body>
 </html>
