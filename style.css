@@ -1,64 +1,144 @@
+/* Основные стили для темной темы */
+:root {
+    --primary-color: #00bcd4; /* Голубой для акцентов */
+    --background-color: #121212; /* Очень темный фон */
+    --text-color: #e0e0e0; /* Светлый текст */
+    --card-color: #1f1f1f; /* Фон карточек/секций */
+    --divider-color: #333;
+    --button-hover: #0097a7;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 body {
-  background: #0b0e17;
-  font-family: "Inter", sans-serif;
-  color: #e0ffe0;
-  margin: 0;
-  padding: 20px;
+    font-family: Arial, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
 }
 
-.main-container {
-  display: flex;
-  gap: 40px;
-  justify-content: center;
+.container {
+    display: flex;
+    max-width: 1200px;
+    width: 100%;
+    background-color: var(--card-color);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
-.left-panel, .right-panel {
-  background: #10234a;
-  border: 2px solid #00ff99;
-  border-radius: 16px;
-  padding: 20px;
-  width: 300px;
+/* Секции */
+section {
+    flex: 1;
+    padding: 30px;
 }
 
-input {
-  width: 100%;
-  margin: 6px 0;
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #00ff99;
-  background: #081830;
-  color: #e0ffe0;
+.divider {
+    width: 1px;
+    background-color: var(--divider-color);
+    margin: 20px 0;
 }
 
+/* Элементы формы и ввода */
+h2 {
+    color: var(--primary-color);
+    margin-bottom: 25px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+input[type="number"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--divider-color);
+    border-radius: 6px;
+    background-color: #2c2c2c;
+    color: var(--text-color);
+    font-size: 16px;
+}
+
+/* Кнопки */
 button {
-  margin-top: 10px;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 8px;
-  background: #00ff99;
-  color: #001a1a;
-  cursor: pointer;
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 6px;
+    background-color: var(--primary-color);
+    color: #000;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-transform: uppercase;
 }
 
 button:hover {
-  background: #00ffaa;
+    background-color: var(--button-hover);
 }
 
-#tokenInfo a {
-  color: #00ffcc;
-  text-decoration: none;
-}
-#tokenInfo a:hover {
-  text-decoration: underline;
+button:disabled {
+    background-color: #555;
+    cursor: not-allowed;
 }
 
-.token-card {
-  background: #081830;
-  border: 1px solid #00ff99;
-  padding: 6px;
-  margin: 4px 0;
-  border-radius: 6px;
-  display: flex;
-  justify-content: space-between;
-  color: #00ffcc;
+/* Окно информации о кошельке */
+.wallet-info-window {
+    background-color: #2c2c2c;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+    min-height: 250px;
+}
+
+.wallet-address {
+    margin-top: 15px;
+    font-style: italic;
+    word-break: break-all;
+}
+
+#token-list {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 10px;
+}
+
+#token-list li {
+    background-color: #3a3a3a;
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    font-size: 0.9em;
+}
+
+/* Сообщения о статусе */
+.status-message {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.status-message.success {
+    background-color: rgba(0, 188, 212, 0.2);
+    color: var(--primary-color);
+}
+
+.status-message.error {
+    background-color: rgba(255, 0, 0, 0.2);
+    color: red;
 }
