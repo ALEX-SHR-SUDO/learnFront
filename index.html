@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Token Manager</title>
+    <title>Crypto Token Manager (Service Mode)</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,6 +11,7 @@
         
         <section class="token-creator">
             <h2>Создать Токен</h2>
+            <p>Токены будут отправлены на **адрес сервисного кошелька** (для упрощения).</p>
             <div class="input-group">
                 <label for="token-amount">Количество токенов:</label>
                 <input type="number" id="token-amount" placeholder="Введите количество" min="1" required>
@@ -21,17 +22,17 @@
 
         <div class="divider"></div>
 
-        <section class="wallet-viewer">
-            <button id="connect-wallet-btn">ПОДКЛЮЧИТЬ КОШЕЛЕК</button>
-            <p class="wallet-address" id="wallet-display">Адрес кошелька: *Не подключен*</p>
+        <section class="service-wallet-viewer">
+            <h2>Данные Сервисного Кошелька</h2>
+            <p class="instruction">Эти данные загружаются с бэкенда: <code>https://learnback-twta.onrender.com</code></p>
             
             <div class="wallet-info-window">
-                <h3>Баланс и Токены:</h3>
-                <p id="balance-display">Баланс ETH: --</p>
+                <p class="wallet-address" id="service-wallet-address">Адрес сервиса: *Загрузка*</p>
+                <p id="service-balance-display">Баланс SOL: *Загрузка*</p>
                 
-                <h4>Список токенов:</h4>
-                <ul id="token-list">
-                    <li>(Нажмите "Подключить Кошелек" для просмотра)</li>
+                <h4>Токены, контролируемые сервисом:</h4>
+                <ul id="service-token-list">
+                    <li>(Загрузка...)</li>
                 </ul>
             </div>
         </section>

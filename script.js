@@ -8,34 +8,29 @@ const createTokenBtn = document.getElementById('create-token-btn');
 const tokenAmountInput = document.getElementById('token-amount');
 const createStatusMessage = document.getElementById('create-status-message');
 
-const connectWalletBtn = document.getElementById('connect-wallet-btn');
-const walletDisplay = document.getElementById('wallet-display');
-const balanceDisplay = document.getElementById('balance-display');
-const tokenList = document.getElementById('token-list');
+// Элементы для сервисного кошелька (остались)
+const serviceWalletAddressEl = document.getElementById('service-wallet-address');
+const serviceBalanceDisplay = document.getElementById('service-balance-display');
+const serviceTokenList = document.getElementById('service-token-list');
 
 // ------------------------------------------
 // II. Глобальное состояние
 // ------------------------------------------
-let userWalletAddress = null; // Будет хранить адрес подключенного кошелька
-
+// Переменная для хранения адреса сервисного кошелька,
+// который мы получим с бэкенда
+let serviceWalletAddress = null; 
 
 // ------------------------------------------
 // III. Утилита для обновления статуса
 // ------------------------------------------
 
-/**
- * Обновляет сообщение о статусе для секции создания токена.
- * @param {string} message - Текст сообщения.
- * @param {'success' | 'error' | 'loading'} type - Тип сообщения.
- */
 function updateCreateStatus(message, type) {
     createStatusMessage.textContent = message;
     createStatusMessage.className = `status-message ${type}`;
 }
 
-
 // ------------------------------------------
-// IV. Логика Создания Токена (POST)
+// IV. Логика Создания Токена (POST) - Обновлена
 // ------------------------------------------
 
 createTokenBtn.addEventListener('click', async () => {
@@ -45,9 +40,10 @@ createTokenBtn.addEventListener('click', async () => {
         updateCreateStatus('Пожалуйста, введите корректное количество.', 'error');
         return;
     }
-
-    if (!userWalletAddress) {
-        updateCreateStatus('Сначала подключите кошелек!', 'error');
+    
+    // Используем адрес, который мы загрузили при старте
+    if (!serviceWalletAddress) {
+        updateCreateStatus('Ошибка: Адрес сервисного кошелька не загружен. Обновите страницу.', 'error');
         return;
     }
 
@@ -60,9 +56,10 @@ createTokenBtn.addEventListener('click', async () => {
             headers: {
                 'Content-Type': 'application/json'
             },
+            // Отправляем токены обратно на тот же сервисный кошелек
             body: JSON.stringify({
                 amount: amount,
-                recipient: userWalletAddress // Отправляем адрес, куда отправить токены
+                recipient: serviceWalletAddress 
             })
         });
 
@@ -70,10 +67,9 @@ createTokenBtn.addEventListener('click', async () => {
 
         if (response.ok) {
             updateCreateStatus(`Успех! Создано ${amount} токенов. Транзакция: ${data.txHash.slice(0, 10)}...`, 'success');
-            // После успешного создания обновляем информацию о кошельке
-            fetchWalletInfo(userWalletAddress); 
+            // После создания обновляем информацию о сервисном кошельке
+            fetchServiceWalletInfo(); 
         } else {
-            // Ошибка от сервера (4xx, 5xx)
             throw new Error(data.message || 'Ошибка сервера при создании токена.');
         }
 
@@ -87,72 +83,55 @@ createTokenBtn.addEventListener('click', async () => {
 
 
 // ------------------------------------------
-// V. Логика Подключения Кошелька (Имитация)
+// V. ЛОГИКА: Получение Информации о Сервисном Кошельке
 // ------------------------------------------
 
-/**
- * Имитирует подключение кошелька (в реальном приложении - MetaMask или Web3).
- * В учебных целях просто генерируем фейковый адрес.
- */
-function connectWallet() {
-    // В реальном приложении здесь будет логика Web3/MetaMask
-    // Например: const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    
-    // Имитация:
-    userWalletAddress = '0x' + Array(40).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join(''); 
-    
-    walletDisplay.textContent = `Адрес кошелька: ${userWalletAddress.slice(0, 8)}...${userWalletAddress.slice(-6)}`;
-    connectWalletBtn.textContent = 'КОШЕЛЕК ПОДКЛЮЧЕН';
-    connectWalletBtn.disabled = true;
-    
-    fetchWalletInfo(userWalletAddress);
-}
-
-connectWalletBtn.addEventListener('click', connectWallet);
-
-
-// ------------------------------------------
-// VI. Логика Получения Информации о Кошельке (GET)
-// ------------------------------------------
-
-/**
- * Загружает баланс и список токенов пользователя.
- * @param {string} address - Адрес кошелька пользователя.
- */
-async function fetchWalletInfo(address) {
-    if (!address) return;
-    
-    balanceDisplay.textContent = 'Баланс ETH: Загрузка...';
-    tokenList.innerHTML = '<li>Загрузка токенов...</li>';
+async function fetchServiceWalletInfo() {
+    serviceWalletAddressEl.textContent = 'Адрес сервиса: Загрузка...';
+    serviceBalanceDisplay.textContent = 'Баланс SOL: Загрузка...';
+    serviceTokenList.innerHTML = '<li>Загрузка...</li>';
 
     try {
-        // Запрос на получение баланса и токенов по адресу
-        const response = await fetch(`${BACKEND_URL}/api/wallet-info?address=${address}`);
+        const response = await fetch(`${BACKEND_URL}/api/service-wallet-info`);
         
         if (!response.ok) {
-            throw new Error('Ошибка при загрузке данных кошелька.');
+            throw new Error('Ошибка при загрузке данных сервисного кошелька. Проверьте бэкенд.');
         }
 
         const data = await response.json();
 
-        // 1. Обновление баланса
-        balanceDisplay.textContent = `Баланс ETH: ${data.ethBalance} ETH`; 
+        // **СОХРАНЯЕМ АДРЕС СЕРВИСНОГО КОШЕЛЬКА для POST-запроса**
+        serviceWalletAddress = data.address;
+        
+        // 1. Обновление адреса в интерфейсе
+        const address = data.address;
+        serviceWalletAddressEl.textContent = `Адрес сервиса: ${address.slice(0, 4)}...${address.slice(-4)}`; 
 
-        // 2. Обновление списка токенов
-        tokenList.innerHTML = '';
+        // 2. Обновление баланса
+        serviceBalanceDisplay.textContent = `Баланс SOL: ${data.solBalance} SOL`; 
+
+        // 3. Обновление списка токенов
+        serviceTokenList.innerHTML = '';
         if (data.tokens && data.tokens.length > 0) {
             data.tokens.forEach(token => {
                 const listItem = document.createElement('li');
                 listItem.textContent = `${token.symbol}: ${token.balance}`;
-                tokenList.appendChild(listItem);
+                serviceTokenList.appendChild(listItem);
             });
         } else {
-            tokenList.innerHTML = '<li>Токены не найдены.</li>';
+            serviceTokenList.innerHTML = '<li>Токены не найдены.</li>';
         }
 
     } catch (error) {
-        console.error('Ошибка при получении информации о кошельке:', error);
-        balanceDisplay.textContent = 'Баланс ETH: Ошибка загрузки';
-        tokenList.innerHTML = `<li>Ошибка: ${error.message}</li>`;
+        console.error('КРИТИЧЕСКАЯ ОШИБКА: Сервис недоступен или не возвращает данных.', error);
+        serviceWalletAddressEl.textContent = 'Адрес сервиса: Ошибка загрузки!';
+        serviceBalanceDisplay.textContent = 'Баланс SOL: Ошибка!';
+        serviceTokenList.innerHTML = `<li>Критическая ошибка: ${error.message}</li>`;
     }
 }
+
+// ------------------------------------------
+// VI. ИНИЦИАЛИЗАЦИЯ (Автоматический старт)
+// ------------------------------------------
+
+document.addEventListener('DOMContentLoaded', fetchServiceWalletInfo);
