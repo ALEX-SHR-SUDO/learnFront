@@ -3,38 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Token Manager (Service Mode)</title>
+    <title>Solana Token Factory (Service Backend)</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         
         <section class="token-creator">
-            <h2>Создать Токен</h2>
-            <p>Токены будут отправлены на **адрес сервисного кошелька** (для упрощения).</p>
+            <h2>Создать SPL-токен</h2>
+            <p class="small-info">Токен будет создан от имени сервисного кошелька на **Solana Devnet**.</p>
+            
             <div class="input-group">
-                <label for="token-amount">Количество токенов:</label>
-                <input type="number" id="token-amount" placeholder="Введите количество" min="1" required>
+                <label for="token-supply">Начальное количество (Supply):</label>
+                <input type="number" id="token-supply" placeholder="Например, 1000000" min="1" required value="1000000">
             </div>
+            
+            <div class="input-group">
+                <label for="token-decimals">Десятичные знаки (Decimals):</label>
+                <input type="number" id="token-decimals" placeholder="Обычно 9" min="0" max="9" value="9">
+            </div>
+            
             <button id="create-token-btn">СОЗДАТЬ ТОКЕН</button>
             <p id="create-status-message" class="status-message"></p>
+            <div id="result-link" style="margin-top: 15px;"></div>
         </section>
 
         <div class="divider"></div>
 
         <section class="service-wallet-viewer">
-            <h2>Данные Сервисного Кошелька</h2>
-            <p class="instruction">Эти данные загружаются с бэкенда: <code>https://learnback-twta.onrender.com</code></p>
-            
+            <h2>Баланс Сервисного Кошелька</h2>
+            <p id="loading-status">Загрузка данных...</p>
+
             <div class="wallet-info-window">
-                <p class="wallet-address" id="service-wallet-address">Адрес сервиса: *Загрузка*</p>
-                <p id="service-balance-display">Баланс SOL: *Загрузка*</p>
+                <p class="wallet-address" id="service-wallet-address">Адрес: *Загрузка*</p>
+                <p id="service-balance-display">Баланс **SOL**: *Загрузка*</p>
                 
-                <h4>Токены, контролируемые сервисом:</h4>
+                <h4>Созданные SPL-токены:</h4>
                 <ul id="service-token-list">
-                    <li>(Загрузка...)</li>
+                    <li>(Список токенов)</li>
                 </ul>
             </div>
+            
+            <button id="refresh-btn">Обновить Баланс</button>
         </section>
         
     </div>
