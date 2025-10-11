@@ -57,7 +57,7 @@ async function handleCreateToken() {
     resultLinkDiv.innerHTML = '';
 
     try {
-        const response = await fetch(`${BACKEND_URL}/create-token`, { // Используем /create-token, как в финальной конфигурации
+        const response = await fetch(`${BACKEND_URL}/api/create-token`, { // Используем /create-token, как в финальной конфигурации
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
