@@ -14,6 +14,21 @@
             <p class="small-info">Токен будет создан от имени сервисного кошелька на **Solana Devnet**.</p>
             
             <div class="input-group">
+                <label for="token-name">Имя Токена (Name):</label>
+                <input type="text" id="token-name" placeholder="Например: My Awesome Token" required>
+            </div>
+            
+            <div class="input-group">
+                <label for="token-symbol">Символ Токена (Symbol):</label>
+                <input type="text" id="token-symbol" placeholder="Например: MAWT" required>
+            </div>
+
+            <div class="input-group">
+                <label for="token-uri">URI Метаданных (Arweave/IPFS URL):</label>
+                <input type="url" id="token-uri" placeholder="https://arweave.net/..." required>
+                <p class="small-info">URL, указывающий на JSON-файл метаданных (изображение, описание).</p>
+            </div>
+            <div class="input-group">
                 <label for="token-supply">Начальное количество (Supply):</label>
                 <input type="number" id="token-supply" placeholder="Например, 1000000" min="1" required value="1000000">
             </div>

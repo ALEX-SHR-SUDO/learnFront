@@ -10,6 +10,10 @@ const tokenSupplyInput = document.getElementById('token-supply');
 const tokenDecimalsInput = document.getElementById('token-decimals');
 const createStatusMessage = document.getElementById('create-status-message');
 const resultLinkDiv = document.getElementById('result-link');
+// ✅ НОВЫЕ ПОЛЯ ДЛЯ МЕТАДАННЫХ
+const tokenNameInput = document.getElementById('token-name');
+const tokenSymbolInput = document.getElementById('token-symbol');
+const tokenUriInput = document.getElementById('token-uri');
 
 const serviceWalletAddressEl = document.getElementById('service-wallet-address');
 const serviceBalanceDisplay = document.getElementById('service-balance-display');
@@ -31,9 +35,18 @@ function updateStatus(element, message, type) {
 // ------------------------------------------
 
 async function handleCreateToken() {
+    // ✅ Считываем ВСЕ 5 полей
+    const name = tokenNameInput.value;
+    const symbol = tokenSymbolInput.value;
+    const uri = tokenUriInput.value;
     const supply = tokenSupplyInput.value;
     const decimals = tokenDecimalsInput.value;
 
+     // Обновленная проверка валидации
+    if (!name || !symbol || !uri) {
+        updateStatus(createStatusMessage, '❗ Заполните все поля метаданных (Имя, Символ, URI).', 'error');
+        return;
+    }
     if (!supply || parseInt(supply) <= 0) {
         updateStatus(createStatusMessage, '❗ Заполните количество (Supply).', 'error');
         return;
@@ -44,12 +57,16 @@ async function handleCreateToken() {
     resultLinkDiv.innerHTML = '';
 
     try {
-        const response = await fetch(`${BACKEND_URL}/api/create-token`, {
+        const response = await fetch(`${BACKEND_URL}/create-token`, { // Используем /create-token, как в финальной конфигурации
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
+            // ✅ Отправляем все пять полей
             body: JSON.stringify({
+                name: name,
+                symbol: symbol,
+                uri: uri,
                 supply: supply,
                 decimals: decimals
             })
