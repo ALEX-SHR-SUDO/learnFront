@@ -110,30 +110,37 @@ async function fetchServiceWalletInfo() {
     try {
         const response = await fetch(`${BACKEND_URL}/api/balance`);
         
+        // ❌ ПРОВЕРКА ОШИБОК БЭКЕНДА: Если статус не 200, читаем тело ответа как ошибку
         if (!response.ok) {
-            throw new Error('Ошибка при загрузке данных с бэкенда.');
+            const errorData = await response.json();
+            throw new Error(errorData.error || `Ошибка ${response.status} при загрузке данных.`);
         }
 
         const data = await response.json();
         
         // 1. Адрес
-        // В вашем бэкенде адрес сервисного кошелька не возвращается в /api/balance,
-        // но мы можем отобразить его из консоли, если он там есть, или просто указать, что он загружен.
-        // Для простоты, мы отобразим адрес из заглушки или попросим добавить его в эндпоинт /api/balance.
-        // Предполагаем, что бэкенд возвращает адрес как serviceAddress:
-        const address = data.serviceAddress || 'Успешно загружен (адрес не предоставлен в /api/balance)'; 
+        const address = data.serviceAddress || 'Адрес не предоставлен'; 
         serviceWalletAddressEl.textContent = `Адрес: ${typeof address === 'string' && address.length > 8 ? address.slice(0, 4) + '...' + address.slice(-4) : address}`;
 
         // 2. Баланс SOL
-        serviceBalanceDisplay.textContent = `Баланс SOL: ${data.sol.toFixed(4)} SOL`; 
+        // ✅ ИСПРАВЛЕНИЕ: Добавляем проверку data.sol перед вызовом toFixed()
+        if (typeof data.sol === 'number') {
+            serviceBalanceDisplay.textContent = `Баланс SOL: ${data.sol.toFixed(4)} SOL`; 
+        } else {
+            // Fallback, если бэкенд не вернул баланс (например, из-за ошибки ключа)
+            serviceBalanceDisplay.textContent = `Баланс SOL: Ошибка загрузки`; 
+        }
 
         // 3. Список токенов
         serviceTokenList.innerHTML = '';
         if (data.tokens && data.tokens.length > 0) {
             data.tokens.forEach(token => {
                 const listItem = document.createElement('li');
+                // Добавляем проверку на существование token.mint
+                const mintDisplay = token.mint ? `${token.mint.slice(0, 6)}...${token.mint.slice(-4)}` : 'N/A';
+                
                 listItem.innerHTML = `
-                    <span>Mint: ${token.mint.slice(0, 6)}...${token.mint.slice(-4)}</span> 
+                    <span>Mint: ${mintDisplay}</span> 
                     <strong>${token.amount}</strong>
                 `;
                 serviceTokenList.appendChild(listItem);
@@ -146,7 +153,11 @@ async function fetchServiceWalletInfo() {
 
     } catch (error) {
         console.error('❌ Критическая ошибка:', error);
-        loadingStatus.textContent = `❌ Ошибка подключения: ${error.message}. Проверьте бэкенд.`;
+        // Отображаем ошибку, полученную от бэкенда (например, "Failed to load Keypair...")
+        const errorMessage = error.message || 'Ошибка подключения';
+        loadingStatus.textContent = `❌ Ошибка: ${errorMessage.slice(0, 50)}...`;
+        
+        // Сброс полей при ошибке
         serviceWalletAddressEl.textContent = 'Адрес: Ошибка';
         serviceBalanceDisplay.textContent = 'Баланс SOL: Ошибка';
         serviceTokenList.innerHTML = '<li>Ошибка загрузки токенов.</li>';
