@@ -132,22 +132,22 @@ async function fetchServiceWalletInfo() {
         }
 
         // 3. Список токенов
-        serviceTokenList.innerHTML = '';
-        if (data.tokens && data.tokens.length > 0) {
-            data.tokens.forEach(token => {
-                const listItem = document.createElement('li');
-                // Добавляем проверку на существование token.mint
-                const mintDisplay = token.mint ? `${token.mint.slice(0, 6)}...${token.mint.slice(-4)}` : 'N/A';
-                
+     // ... после получения data.tokens ...
+       serviceTokenList.innerHTML = '';
+           if (data.tokens && data.tokens.length > 0) {
+             data.tokens.forEach(token => {
+              const listItem = document.createElement('li');
                 listItem.innerHTML = `
-                    <span>Mint: ${mintDisplay}</span> 
-                    <strong>${token.amount}</strong>
-                `;
+                   <span><strong>Mint:</strong> ${token.mint}</span>
+                    <span><strong>Amount:</strong> ${token.amount}</span>
+                     <span><strong>Decimals:</strong> ${token.decimals}</span>
+                   ${token.symbol ? `<span><strong>Symbol:</strong> ${token.symbol}</span>` : ""}
+                   `;
                 serviceTokenList.appendChild(listItem);
-            });
-        } else {
-            serviceTokenList.innerHTML = '<li>Токены SPL не найдены.</li>';
-        }
+                   });
+                } else {
+               serviceTokenList.innerHTML = '<li>Токены SPL не найдены.</li>';
+              }
         
         loadingStatus.textContent = 'Данные успешно загружены.';
 
