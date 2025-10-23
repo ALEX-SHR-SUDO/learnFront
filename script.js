@@ -78,7 +78,7 @@ async function handleCreateToken() {
             
             // Вывод ссылки на Solscan
             resultLinkDiv.innerHTML = `
-                <a href="${data.solscan}" target="_blank" style="color: var(--link-color); text-decoration: none;">
+                   <a href="https://solscan.io/tx/${data.transactionSignature}?cluster=devnet" target="_blank" style="color: var(--link-color); text-decoration: none;">
                     🔍 Посмотреть транзакцию на Solscan
                 </a>
             `;
