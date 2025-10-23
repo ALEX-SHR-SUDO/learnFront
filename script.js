@@ -42,7 +42,7 @@ async function handleCreateToken() {
     const supply = tokenSupplyInput.value;
     const decimals = tokenDecimalsInput.value;
 
-     // Обновленная проверка валидации
+    // Обновленная проверка валидации
     if (!name || !symbol || !uri) {
         updateStatus(createStatusMessage, '❗ Заполните все поля метаданных (Имя, Символ, URI).', 'error');
         return;
@@ -57,12 +57,11 @@ async function handleCreateToken() {
     resultLinkDiv.innerHTML = '';
 
     try {
-        const response = await fetch(`${BACKEND_URL}/api/create-token`, { // Используем /create-token, как в финальной конфигурации
+        const response = await fetch(`${BACKEND_URL}/api/create-token`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            // ✅ Отправляем все пять полей
             body: JSON.stringify({
                 name: name,
                 symbol: symbol,
@@ -87,7 +86,6 @@ async function handleCreateToken() {
             // Обновляем список токенов
             await fetchServiceWalletInfo(); 
         } else {
-            // Ошибка от сервера (400, 500)
             throw new Error(data.error || 'Неизвестная ошибка сервера.');
         }
 
@@ -123,41 +121,36 @@ async function fetchServiceWalletInfo() {
         serviceWalletAddressEl.textContent = `Адрес: ${typeof address === 'string' && address.length > 8 ? address.slice(0, 4) + '...' + address.slice(-4) : address}`;
 
         // 2. Баланс SOL
-        // ✅ ИСПРАВЛЕНИЕ: Добавляем проверку data.sol перед вызовом toFixed()
         if (typeof data.sol === 'number') {
             serviceBalanceDisplay.textContent = `Баланс SOL: ${data.sol.toFixed(4)} SOL`; 
         } else {
-            // Fallback, если бэкенд не вернул баланс (например, из-за ошибки ключа)
             serviceBalanceDisplay.textContent = `Баланс SOL: Ошибка загрузки`; 
         }
 
-        // 3. Список токенов
-     // ... после получения data.tokens ...
-       serviceTokenList.innerHTML = '';
-           if (data.tokens && data.tokens.length > 0) {
-             data.tokens.forEach(token => {
-              const listItem = document.createElement('li');
+        // 3. Список токенов (расширенный вывод)
+        serviceTokenList.innerHTML = '';
+        const tokens = data.tokens || data.splTokens || [];
+        if (tokens.length > 0) {
+            tokens.forEach(token => {
+                const listItem = document.createElement('li');
                 listItem.innerHTML = `
-                   <span><strong>Mint:</strong> ${token.mint}</span>
+                    <span><strong>Mint:</strong> ${token.mint}</span>
                     <span><strong>Amount:</strong> ${token.amount}</span>
-                     <span><strong>Decimals:</strong> ${token.decimals}</span>
-                   ${token.symbol ? `<span><strong>Symbol:</strong> ${token.symbol}</span>` : ""}
-                   `;
+                    <span><strong>Decimals:</strong> ${token.decimals}</span>
+                    ${token.symbol ? `<span><strong>Symbol:</strong> ${token.symbol}</span>` : ""}
+                `;
                 serviceTokenList.appendChild(listItem);
-                   });
-                } else {
-               serviceTokenList.innerHTML = '<li>Токены SPL не найдены.</li>';
-              }
+            });
+        } else {
+            serviceTokenList.innerHTML = '<li>Токены SPL не найдены.</li>';
+        }
         
         loadingStatus.textContent = 'Данные успешно загружены.';
 
     } catch (error) {
         console.error('❌ Критическая ошибка:', error);
-        // Отображаем ошибку, полученную от бэкенда (например, "Failed to load Keypair...")
         const errorMessage = error.message || 'Ошибка подключения';
         loadingStatus.textContent = `❌ Ошибка: ${errorMessage.slice(0, 50)}...`;
-        
-        // Сброс полей при ошибке
         serviceWalletAddressEl.textContent = 'Адрес: Ошибка';
         serviceBalanceDisplay.textContent = 'Баланс SOL: Ошибка';
         serviceTokenList.innerHTML = '<li>Ошибка загрузки токенов.</li>';
@@ -170,9 +163,6 @@ async function fetchServiceWalletInfo() {
 // V. Инициализация и обработчики
 // ------------------------------------------
 
-// Запуск загрузки данных при старте
 document.addEventListener('DOMContentLoaded', fetchServiceWalletInfo);
-
-// Обработчики кнопок
 createTokenBtn.addEventListener('click', handleCreateToken);
 refreshBtn.addEventListener('click', fetchServiceWalletInfo);
