@@ -74,7 +74,7 @@ async function handleCreateToken() {
         const data = await response.json();
 
         if (response.ok) {
-            updateStatus(createStatusMessage, `✅ Токен создан! Mint: ${data.mint.slice(0, 6)}...`, 'success');
+            updateStatus(createStatusMessage, `✅ Токен создан! Mint: ${data.mintAddress.slice(0, 6)}...`, 'success');
             
             // Вывод ссылки на Solscan
             resultLinkDiv.innerHTML = `
