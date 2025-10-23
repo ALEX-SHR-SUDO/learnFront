@@ -116,30 +116,34 @@ button:disabled {
     padding: 20px;
     border-radius: 8px;
     margin-top: 15px;
-    min-height: 150px;
-}
-
-.wallet-address {
-    margin-bottom: 10px;
-    font-weight: bold;
-    word-break: break-all;
-    color: var(--link-color);
+    min-height: 300px; /* было 150px, стало больше */
+    max-height: 600px;
+    overflow: auto; /* добавлена прокрутка */
 }
 
 #service-token-list {
     list-style: none;
     padding-left: 0;
     margin-top: 10px;
+    max-height: 400px; /* ограничение высоты для прокрутки */
+    overflow-y: auto;
 }
 
 #service-token-list li {
     background-color: #3a3a3a;
-    padding: 8px;
-    border-radius: 4px;
-    margin-bottom: 5px;
-    font-size: 0.9em;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    font-size: 1.1em;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column; /* перенос строк */
+    gap: 6px;
+    word-break: break-all;
+}
+
+#service-token-list li span strong {
+    color: #9945FF;
+    margin-right: 6px;
 }
 
 /* Сообщения о статусе */
