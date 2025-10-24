@@ -167,3 +167,25 @@ button:disabled {
 .status-message.loading {
     color: orange;
 }
+
+/* ====== ДОБАВЛЕНО: стили для upload логотипа ====== */
+#logo-upload-status, #token-create-status {
+    margin-left: 1em;
+    color: #0c0;
+}
+
+#logo-preview {
+    margin-top: 1em;
+    border: 1px solid #aaa;
+    border-radius: 6px;
+    max-width: 150px;
+    display: block;
+}
+
+#token-info {
+    margin-top: 1em;
+    padding: 1em;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px #ccc;
+}
