@@ -2,34 +2,65 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Создать токен Solana + Загрузка логотипа</title>
+  <title>Solana Token Factory</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="favicon.ico">
 </head>
 <body>
-  <h1>Создать токен Solana</h1>
+  <div class="container">
+    <section class="token-creator">
+      <h2>Создать SPL-токен</h2>
+      <!-- Форма загрузки логотипа -->
+      <form id="upload-logo-form" class="input-group">
+        <label for="logo-file">Логотип токена (jpg/png):</label>
+        <input type="file" id="logo-file" accept="image/*" />
+        <button type="submit">Загрузить логотип</button>
+        <span id="logo-upload-status"></span>
+      </form>
+      <img id="logo-preview" style="max-width:150px;display:none;" />
 
-  <!-- Форма загрузки логотипа -->
-  <form id="upload-logo-form">
-    <label for="logo-file">Логотип токена (jpg/png):</label>
-    <input type="file" id="logo-file" accept="image/*" />
-    <button type="submit">Загрузить логотип</button>
-    <span id="logo-upload-status"></span>
-  </form>
-  <img id="logo-preview" style="max-width:150px;display:none;" />
-
-  <!-- Форма создания токена -->
-  <form id="create-token-form">
-    <input type="text" id="token-name" placeholder="Имя токена" required />
-    <input type="text" id="token-symbol" placeholder="Символ токена" required />
-    <input type="number" id="token-supply" placeholder="Суммарный supply" required />
-    <input type="number" id="token-decimals" placeholder="Decimals" required />
-    <input type="text" id="token-uri" placeholder="URI для metadata (JSON на IPFS)" required />
-    <button type="submit">Создать токен</button>
-    <span id="token-create-status"></span>
-  </form>
-  <div id="token-info"></div>
-
+      <!-- Форма создания токена -->
+      <form id="create-token-form">
+        <div class="input-group">
+          <label for="token-name">Имя токена:</label>
+          <input type="text" id="token-name" required />
+        </div>
+        <div class="input-group">
+          <label for="token-symbol">Символ токена:</label>
+          <input type="text" id="token-symbol" required />
+        </div>
+        <div class="input-group">
+          <label for="token-supply">Количество (Supply):</label>
+          <input type="number" id="token-supply" min="1" required value="1000000"/>
+        </div>
+        <div class="input-group">
+          <label for="token-decimals">Десятичные знаки (Decimals):</label>
+          <input type="number" id="token-decimals" min="0" max="9" value="9" required />
+        </div>
+        <div class="input-group">
+          <label for="token-uri">URI Метаданных (Arweave/IPFS):</label>
+          <input type="text" id="token-uri" placeholder="https://..." required />
+          <p class="small-info">URL JSON-файла метаданных (включая ссылку на логотип).</p>
+        </div>
+        <button id="create-token-btn" type="submit">Создать токен</button>
+        <p id="create-status-message" class="status-message"></p>
+        <div id="result-link" style="margin-top: 15px;"></div>
+      </form>
+    </section>
+    <div class="divider"></div>
+    <section>
+      <h2>Баланс кошелька</h2>
+      <p id="loading-status">Загрузка данных...</p>
+      <p class="wallet-address" id="service-wallet-address">Адрес: *Загрузка*</p>
+      <p id="service-balance-display">Баланс SOL: *Загрузка*</p>
+      <h4>Созданные SPL-токены:</h4>
+      <ul id="service-token-list">
+        <li>(Список токенов)</li>
+      </ul>
+      <button id="refresh-btn">Обновить Баланс</button>
+    </section>
+  </div>
   <script src="script.js"></script>
 </body>
 </html>
