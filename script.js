@@ -22,16 +22,18 @@ const logoFileInput = document.getElementById('logo-file');
 const logoUploadStatus = document.getElementById('logo-upload-status');
 const logoPreview = document.getElementById('logo-preview');
 
-// ===== Загрузка логотипа на Pinata =====
+// ===== Загрузка логотипа на Pinata с проверкой =====
 uploadLogoForm.addEventListener('submit', async function(e) {
   e.preventDefault();
   const file = logoFileInput.files[0];
   if (!file) {
     logoUploadStatus.textContent = 'Выберите файл!';
+    logoUploadStatus.className = 'status-message error';
     logoPreview.style.display = "none";
     return;
   }
   logoUploadStatus.textContent = 'Загрузка...';
+  logoUploadStatus.className = 'status-message loading';
 
   const formData = new FormData();
   formData.append('file', file);
@@ -41,18 +43,35 @@ uploadLogoForm.addEventListener('submit', async function(e) {
       method: 'POST',
       body: formData
     });
+
+    // Проверяем статус ответа
+    if (!res.ok) {
+      let data = {};
+      try { data = await res.json(); } catch {}
+      logoUploadStatus.textContent = `❌ Ошибка: ${data.error || 'Не удалось загрузить логотип.'}`;
+      logoUploadStatus.className = 'status-message error';
+      logoPreview.style.display = "none";
+      return;
+    }
+
+    // Получаем результат
     const data = await res.json();
-    if (res.ok) {
+
+    // Проверяем наличие ipfsUrl и корректность ссылки
+    if (typeof data.ipfsUrl === 'string' && /^https?:\/\/.+\/ipfs\/.+$/.test(data.ipfsUrl)) {
       logoUploadStatus.textContent = `✅ Успех! IPFS: ${data.ipfsUrl}`;
+      logoUploadStatus.className = 'status-message success';
       logoPreview.src = data.ipfsUrl;
       logoPreview.style.display = "block";
       window.tokenLogoIpfsUrl = data.ipfsUrl;
     } else {
-      logoUploadStatus.textContent = `❌ Ошибка: ${data.error}`;
+      logoUploadStatus.textContent = `❌ Ошибка: Не удалось получить ссылку на логотип.`;
+      logoUploadStatus.className = 'status-message error';
       logoPreview.style.display = "none";
     }
   } catch (err) {
     logoUploadStatus.textContent = `❌ Ошибка: ${err.message}`;
+    logoUploadStatus.className = 'status-message error';
     logoPreview.style.display = "none";
   }
 });
