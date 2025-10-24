@@ -1,5 +1,4 @@
 // Адрес вашего бэкенд сервиса.
-// В данном случае, это адрес, который вы используете на Render (или локальный, если вы его запускаете).
 const BACKEND_URL = 'https://learnback-twta.onrender.com'; // Используйте порт, на котором запущен ваш Express-сервер
 
 // ------------------------------------------
@@ -21,6 +20,12 @@ const serviceTokenList = document.getElementById('service-token-list');
 const refreshBtn = document.getElementById('refresh-btn');
 const loadingStatus = document.getElementById('loading-status');
 
+// ===== ДОБАВЛЕНО: Элементы для загрузки логотипа =====
+const uploadLogoForm = document.getElementById('upload-logo-form');
+const logoFileInput = document.getElementById('logo-file');
+const logoUploadStatus = document.getElementById('logo-upload-status');
+const logoPreview = document.getElementById('logo-preview');
+
 // ------------------------------------------
 // II. Утилита для обновления статуса
 // ------------------------------------------
@@ -31,7 +36,47 @@ function updateStatus(element, message, type) {
 }
 
 // ------------------------------------------
-// III. Логика Создания Токена (POST /api/create-token)
+// III. Логика загрузки логотипа токена на Pinata
+// ------------------------------------------
+if (uploadLogoForm) {
+    uploadLogoForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const file = logoFileInput.files[0];
+        if (!file) {
+            logoUploadStatus.textContent = 'Выберите файл!';
+            logoPreview.style.display = "none";
+            return;
+        }
+        logoUploadStatus.textContent = 'Загрузка...';
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const res = await fetch(`${BACKEND_URL}/api/upload-logo`, {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+            if (res.ok) {
+                logoUploadStatus.textContent = `✅ Успех! IPFS: ${data.ipfsUrl}`;
+                logoPreview.src = data.ipfsUrl;
+                logoPreview.style.display = "block";
+                // Сохрани ссылку для image в metadata токена
+                window.tokenLogoIpfsUrl = data.ipfsUrl;
+            } else {
+                logoUploadStatus.textContent = `❌ Ошибка: ${data.error}`;
+                logoPreview.style.display = "none";
+            }
+        } catch (err) {
+            logoUploadStatus.textContent = `❌ Ошибка: ${err.message}`;
+            logoPreview.style.display = "none";
+        }
+    });
+}
+
+// ------------------------------------------
+// IV. Логика Создания Токена (POST /api/create-token)
 // ------------------------------------------
 
 async function handleCreateToken() {
@@ -51,7 +96,7 @@ async function handleCreateToken() {
         updateStatus(createStatusMessage, '❗ Заполните количество (Supply).', 'error');
         return;
     }
-    
+
     updateStatus(createStatusMessage, 'Создание и минт токена, подождите...', 'loading');
     createTokenBtn.disabled = true;
     resultLinkDiv.innerHTML = '';
@@ -75,16 +120,16 @@ async function handleCreateToken() {
 
         if (response.ok) {
             updateStatus(createStatusMessage, `✅ Токен создан! Mint: ${data.mintAddress.slice(0, 6)}...`, 'success');
-            
+
             // Вывод ссылки на Solscan
             resultLinkDiv.innerHTML = `
                    <a href="https://solscan.io/tx/${data.transactionSignature}?cluster=devnet" target="_blank" style="color: var(--link-color); text-decoration: none;">
                     🔍 Посмотреть транзакцию на Solscan
                 </a>
             `;
-            
+
             // Обновляем список токенов
-            await fetchServiceWalletInfo(); 
+            await fetchServiceWalletInfo();
         } else {
             throw new Error(data.error || 'Неизвестная ошибка сервера.');
         }
@@ -98,7 +143,7 @@ async function handleCreateToken() {
 }
 
 // ------------------------------------------
-// IV. Логика Получения Информации (GET /api/balance)
+// V. Логика Получения Информации (GET /api/balance)
 // ------------------------------------------
 
 async function fetchServiceWalletInfo() {
@@ -107,7 +152,7 @@ async function fetchServiceWalletInfo() {
 
     try {
         const response = await fetch(`${BACKEND_URL}/api/balance`);
-        
+
         // ❌ ПРОВЕРКА ОШИБОК БЭКЕНДА: Если статус не 200, читаем тело ответа как ошибку
         if (!response.ok) {
             const errorData = await response.json();
@@ -115,16 +160,16 @@ async function fetchServiceWalletInfo() {
         }
 
         const data = await response.json();
-        
+
         // 1. Адрес
-        const address = data.serviceAddress || 'Адрес не предоставлен'; 
+        const address = data.serviceAddress || 'Адрес не предоставлен';
         serviceWalletAddressEl.textContent = `Адрес: ${typeof address === 'string' && address.length > 8 ? address.slice(0, 4) + '...' + address.slice(-4) : address}`;
 
         // 2. Баланс SOL
         if (typeof data.sol === 'number') {
-            serviceBalanceDisplay.textContent = `Баланс SOL: ${data.sol.toFixed(4)} SOL`; 
+            serviceBalanceDisplay.textContent = `Баланс SOL: ${data.sol.toFixed(4)} SOL`;
         } else {
-            serviceBalanceDisplay.textContent = `Баланс SOL: Ошибка загрузки`; 
+            serviceBalanceDisplay.textContent = `Баланс SOL: Ошибка загрузки`;
         }
 
         // 3. Список токенов (расширенный вывод)
@@ -144,7 +189,7 @@ async function fetchServiceWalletInfo() {
         } else {
             serviceTokenList.innerHTML = '<li>Токены SPL не найдены.</li>';
         }
-        
+
         loadingStatus.textContent = 'Данные успешно загружены.';
 
     } catch (error) {
@@ -160,7 +205,7 @@ async function fetchServiceWalletInfo() {
 }
 
 // ------------------------------------------
-// V. Инициализация и обработчики
+// VI. Инициализация и обработчики
 // ------------------------------------------
 
 document.addEventListener('DOMContentLoaded', fetchServiceWalletInfo);
