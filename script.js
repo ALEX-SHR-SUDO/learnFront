@@ -22,7 +22,52 @@ const logoFileInput = document.getElementById('logo-file');
 const logoUploadStatus = document.getElementById('logo-upload-status');
 const logoPreview = document.getElementById('logo-preview');
 
-// ===== Загрузка логотипа на Pinata с проверкой =====
+// ===== Загрузка метадаты JSON на Pinata =====
+async function uploadMetadataToPinata(ipfsLogoUrl) {
+  // Получаем значения из формы
+  const name = tokenNameInput.value || "Token";
+  const symbol = tokenSymbolInput.value || "TKN";
+  // Если есть поле description - добавь его в форму, иначе будет пустая строка
+  const descriptionInput = document.getElementById('token-description');
+  const description = descriptionInput ? descriptionInput.value : "";
+
+  // Формируем JSON метадаты
+  const metadata = {
+    name: name,
+    symbol: symbol,
+    image: ipfsLogoUrl,
+    description: description,
+    attributes: []
+  };
+
+  // Создаём blob из JSON
+  const jsonBlob = new Blob([JSON.stringify(metadata)], { type: "application/json" });
+  const formData = new FormData();
+  formData.append('file', jsonBlob, 'metadata.json');
+
+  // Загружаем JSON на backend -> Pinata
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/upload-logo`, {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+    if (res.ok && typeof data.ipfsUrl === "string") {
+      // Автоматически вставляем URI метадаты в форму
+      tokenUriInput.value = data.ipfsUrl;
+      logoUploadStatus.textContent += '\n✅ Метадата загружена!';
+      logoUploadStatus.className = 'status-message success';
+    } else {
+      logoUploadStatus.textContent = `❌ Ошибка загрузки метадаты: ${data.error || 'Нет ссылки'}`;
+      logoUploadStatus.className = 'status-message error';
+    }
+  } catch (err) {
+    logoUploadStatus.textContent = `❌ Ошибка загрузки метадаты: ${err.message}`;
+    logoUploadStatus.className = 'status-message error';
+  }
+}
+
+// ===== Загрузка логотипа на Pinata с проверкой и автозаполнение URI =====
 uploadLogoForm.addEventListener('submit', async function(e) {
   e.preventDefault();
   const file = logoFileInput.files[0];
@@ -32,7 +77,7 @@ uploadLogoForm.addEventListener('submit', async function(e) {
     logoPreview.style.display = "none";
     return;
   }
-  logoUploadStatus.textContent = 'Загрузка...';
+  logoUploadStatus.textContent = 'Загрузка логотипа...';
   logoUploadStatus.className = 'status-message loading';
 
   const formData = new FormData();
@@ -59,11 +104,14 @@ uploadLogoForm.addEventListener('submit', async function(e) {
 
     // Проверяем наличие ipfsUrl и корректность ссылки
     if (typeof data.ipfsUrl === 'string' && /^https?:\/\/.+\/ipfs\/.+$/.test(data.ipfsUrl)) {
-      logoUploadStatus.textContent = `✅ Успех! IPFS: ${data.ipfsUrl}`;
+      logoUploadStatus.textContent = `✅ Логотип загружен!`;
       logoUploadStatus.className = 'status-message success';
       logoPreview.src = data.ipfsUrl;
       logoPreview.style.display = "block";
       window.tokenLogoIpfsUrl = data.ipfsUrl;
+
+      // ---- Загружаем JSON метадату ----
+      await uploadMetadataToPinata(data.ipfsUrl);
     } else {
       logoUploadStatus.textContent = `❌ Ошибка: Не удалось получить ссылку на логотип.`;
       logoUploadStatus.className = 'status-message error';
