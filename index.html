@@ -1,69 +1,35 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solana Token Factory (Service Backend)</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Создать токен Solana + Загрузка логотипа</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="favicon.ico">
 </head>
 <body>
-    <div class="container">
-        
-        <section class="token-creator">
-            <h2>Создать SPL-токен</h2>
-            <p class="small-info">Токен будет создан от имени сервисного кошелька на **Solana Devnet**.</p>
-            
-            <div class="input-group">
-                <label for="token-name">Имя Токена (Name):</label>
-                <input type="text" id="token-name" placeholder="Например: My Awesome Token" required>
-            </div>
-            
-            <div class="input-group">
-                <label for="token-symbol">Символ Токена (Symbol):</label>
-                <input type="text" id="token-symbol" placeholder="Например: MAWT" required>
-            </div>
+  <h1>Создать токен Solana</h1>
 
-            <div class="input-group">
-                <label for="token-uri">URI Метаданных (Arweave/IPFS URL):</label>
-                <input type="url" id="token-uri" placeholder="https://arweave.net/..." required>
-                <p class="small-info">URL, указывающий на JSON-файл метаданных (изображение, описание).</p>
-            </div>
-            <div class="input-group">
-                <label for="token-supply">Начальное количество (Supply):</label>
-                <input type="number" id="token-supply" placeholder="Например, 1000000" min="1" required value="1000000">
-            </div>
-            
-            <div class="input-group">
-                <label for="token-decimals">Десятичные знаки (Decimals):</label>
-                <input type="number" id="token-decimals" placeholder="Обычно 9" min="0" max="9" value="9">
-            </div>
-            
-            <button id="create-token-btn">СОЗДАТЬ ТОКЕН</button>
-            <p id="create-status-message" class="status-message"></p>
-            <div id="result-link" style="margin-top: 15px;"></div>
-        </section>
+  <!-- Форма загрузки логотипа -->
+  <form id="upload-logo-form">
+    <label for="logo-file">Логотип токена (jpg/png):</label>
+    <input type="file" id="logo-file" accept="image/*" />
+    <button type="submit">Загрузить логотип</button>
+    <span id="logo-upload-status"></span>
+  </form>
+  <img id="logo-preview" style="max-width:150px;display:none;" />
 
-        <div class="divider"></div>
+  <!-- Форма создания токена -->
+  <form id="create-token-form">
+    <input type="text" id="token-name" placeholder="Имя токена" required />
+    <input type="text" id="token-symbol" placeholder="Символ токена" required />
+    <input type="number" id="token-supply" placeholder="Суммарный supply" required />
+    <input type="number" id="token-decimals" placeholder="Decimals" required />
+    <input type="text" id="token-uri" placeholder="URI для metadata (JSON на IPFS)" required />
+    <button type="submit">Создать токен</button>
+    <span id="token-create-status"></span>
+  </form>
+  <div id="token-info"></div>
 
-        <section class="service-wallet-viewer">
-            <h2>Баланс Сервисного Кошелька</h2>
-            <p id="loading-status">Загрузка данных...</p>
-
-            <div class="wallet-info-window">
-                <p class="wallet-address" id="service-wallet-address">Адрес: *Загрузка*</p>
-                <p id="service-balance-display">Баланс **SOL**: *Загрузка*</p>
-                
-                <h4>Созданные SPL-токены:</h4>
-                <ul id="service-token-list">
-                    <li>(Список токенов)</li>
-                </ul>
-            </div>
-            
-            <button id="refresh-btn">Обновить Баланс</button>
-        </section>
-        
-    </div>
-
-    <script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
