@@ -31,11 +31,18 @@ async function uploadMetadataToPinata(ipfsLogoUrl) {
   const descriptionInput = document.getElementById('token-description');
   const description = descriptionInput ? descriptionInput.value : "";
 
+  // --- Всегда используем публичный gateway ---
+  // ipfsLogoUrl обычно уже публичный, но если нет, заменим домен:
+  const safeIpfsLogoUrl = ipfsLogoUrl.replace(
+    /https:\/\/[^\/]+\/ipfs\//,
+    "https://gateway.pinata.cloud/ipfs/"
+  );
+
   // Формируем JSON метадаты
   const metadata = {
     name: name,
     symbol: symbol,
-    image: ipfsLogoUrl,
+    image: safeIpfsLogoUrl,
     description: description,
     attributes: []
   };
@@ -53,8 +60,11 @@ async function uploadMetadataToPinata(ipfsLogoUrl) {
     });
     const data = await res.json();
     if (res.ok && typeof data.ipfsUrl === "string") {
-      // Автоматически вставляем URI метадаты в форму
-      tokenUriInput.value = data.ipfsUrl;
+      // Автоматически вставляем URI метадаты в форму (заменяем gateway для надёжности)
+      tokenUriInput.value = data.ipfsUrl.replace(
+        /https:\/\/[^\/]+\/ipfs\//,
+        "https://gateway.pinata.cloud/ipfs/"
+      );
       logoUploadStatus.textContent += '\n✅ Метадата загружена!';
       logoUploadStatus.className = 'status-message success';
     } else {
@@ -66,6 +76,8 @@ async function uploadMetadataToPinata(ipfsLogoUrl) {
     logoUploadStatus.className = 'status-message error';
   }
 }
+
+// Остальной код без изменений.
 
 // ===== Загрузка логотипа на Pinata с проверкой и автозаполнение URI =====
 uploadLogoForm.addEventListener('submit', async function(e) {
