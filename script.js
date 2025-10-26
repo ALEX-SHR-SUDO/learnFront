@@ -161,7 +161,7 @@ document.getElementById('create-token-form').addEventListener('submit', async fu
       createStatusMessage.textContent = `✅ Токен создан! Mint: ${data.mintAddress.slice(0, 6)}...`;
       createStatusMessage.className = 'status-message success';
       resultLinkDiv.innerHTML = `
-        <a href="https://solscan.io/tx/${data.mintAddress}?cluster=devnet" target="_blank" style="color: var(--link-color); text-decoration: none;">
+        <a href="https://solscan.io/token/${data.mintAddress}?cluster=devnet" target="_blank" style="color: var(--link-color); text-decoration: none;">
           🔍 Посмотреть транзакцию на Solscan
         </a>
       `;
