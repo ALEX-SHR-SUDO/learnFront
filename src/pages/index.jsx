@@ -1,5 +1,4 @@
 import LogoUploader from '../components/LogoUploader';
-import '../styles/globals.css';
 
 export default function Home() {
   return (
