@@ -9,26 +9,112 @@ const resultLinkDiv = document.getElementById('result-link');
 const tokenNameInput = document.getElementById('token-name');
 const tokenSymbolInput = document.getElementById('token-symbol');
 const tokenUriInput = document.getElementById('token-uri');
+const tokenDescriptionInput = document.getElementById('token-description');
 
 const serviceWalletAddressEl = document.getElementById('service-wallet-address');
 const serviceBalanceDisplay = document.getElementById('service-balance-display');
 const serviceTokenList = document.getElementById('service-token-list');
 const refreshBtn = document.getElementById('refresh-btn');
 const loadingStatus = document.getElementById('loading-status');
-const tokenDescriptionInput = document.getElementById('token-description');
 
 // Элементы upload логотипа
-const uploadLogoForm = document.getElementById('upload-logo-form');
+const uploadLogoForm = document.getElementById('upload-logo-form') || document.getElementById('create-token-form');
 const logoFileInput = document.getElementById('logo-file');
 const logoUploadStatus = document.getElementById('logo-upload-status');
 const logoPreview = document.getElementById('logo-preview');
+const logoUploadBlock = document.getElementById('logo-upload-block');
+
+// Drag&Drop для логотипа
+['dragenter', 'dragover'].forEach(eventName => {
+  logoUploadBlock.addEventListener(eventName, (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    logoUploadBlock.classList.add('dragover');
+  });
+});
+['dragleave', 'drop'].forEach(eventName => {
+  logoUploadBlock.addEventListener(eventName, (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    logoUploadBlock.classList.remove('dragover');
+  });
+});
+logoUploadBlock.addEventListener('drop', async (e) => {
+  e.preventDefault();
+  logoUploadBlock.classList.remove('dragover');
+  const files = e.dataTransfer.files;
+  if (files && files[0]) {
+    logoFileInput.files = files;
+    await handleLogoUpload(files[0]);
+  }
+});
+logoUploadBlock.addEventListener('click', () => logoFileInput.click());
+logoFileInput.addEventListener('change', async () => {
+  if (logoFileInput.files && logoFileInput.files[0]) {
+    await handleLogoUpload(logoFileInput.files[0]);
+  }
+});
+
+// ===== Загрузка логотипа на Pinata с проверкой и автозаполнение URI =====
+async function handleLogoUpload(file) {
+  if (!file) {
+    logoUploadStatus.textContent = 'Выберите файл!';
+    logoUploadStatus.className = 'status-message error';
+    logoPreview.src = "default-logo.svg";
+    logoPreview.style.display = "block";
+    return;
+  }
+  logoUploadStatus.textContent = 'Загрузка логотипа...';
+  logoUploadStatus.className = 'status-message loading';
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/upload-logo`, {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!res.ok) {
+      let data = {};
+      try { data = await res.json(); } catch {}
+      logoUploadStatus.textContent = `❌ Ошибка: ${data.error || 'Не удалось загрузить логотип.'}`;
+      logoUploadStatus.className = 'status-message error';
+      logoPreview.src = "default-logo.svg";
+      logoPreview.style.display = "block";
+      return;
+    }
+
+    const data = await res.json();
+    // Принудительно публичный gateway
+    const ipfsUrl = data.ipfsUrl.replace(/https:\/\/[^\/]+\/ipfs\//, "https://gateway.pinata.cloud/ipfs/");
+    if (typeof ipfsUrl === 'string' && /^https?:\/\/.+\/ipfs\/.+$/.test(ipfsUrl)) {
+      logoUploadStatus.textContent = `✅ Логотип загружен!`;
+      logoUploadStatus.className = 'status-message success';
+      logoPreview.src = ipfsUrl;
+      logoPreview.style.display = "block";
+      window.tokenLogoIpfsUrl = ipfsUrl;
+      await uploadMetadataToPinata(ipfsUrl);
+    } else {
+      logoUploadStatus.textContent = `❌ Ошибка: Не удалось получить ссылку на логотип.`;
+      logoUploadStatus.className = 'status-message error';
+      logoPreview.src = "default-logo.svg";
+      logoPreview.style.display = "block";
+    }
+  } catch (err) {
+    logoUploadStatus.textContent = `❌ Ошибка: ${err.message}`;
+    logoUploadStatus.className = 'status-message error';
+    logoPreview.src = "default-logo.svg";
+    logoPreview.style.display = "block";
+  }
+}
 
 // ===== Загрузка метадаты JSON на Pinata =====
 async function uploadMetadataToPinata(ipfsLogoUrl) {
   const name = tokenNameInput.value || "Token";
   const symbol = tokenSymbolInput.value || "TKN";
   const description = tokenDescriptionInput ? tokenDescriptionInput.value : "";
-  // Принудительно используем публичный gateway для картинки
   const safeIpfsLogoUrl = ipfsLogoUrl.replace(/https:\/\/[^\/]+\/ipfs\//, "https://gateway.pinata.cloud/ipfs/");
   const metadata = {
     name: name,
@@ -49,7 +135,6 @@ async function uploadMetadataToPinata(ipfsLogoUrl) {
     });
     const data = await res.json();
     if (res.ok && typeof data.ipfsUrl === "string") {
-      // Публичный gateway для метадаты
       tokenUriInput.value = data.ipfsUrl.replace(/https:\/\/[^\/]+\/ipfs\//, "https://gateway.pinata.cloud/ipfs/");
       logoUploadStatus.textContent += '\n✅ Метадата загружена!';
       logoUploadStatus.className = 'status-message success';
@@ -62,65 +147,6 @@ async function uploadMetadataToPinata(ipfsLogoUrl) {
     logoUploadStatus.className = 'status-message error';
   }
 }
-
-// Остальной код без изменений.
-
-// ===== Загрузка логотипа на Pinata с проверкой и автозаполнение URI =====
-uploadLogoForm.addEventListener('submit', async function(e) {
-  e.preventDefault();
-  const file = logoFileInput.files[0];
-  if (!file) {
-    logoUploadStatus.textContent = 'Выберите файл!';
-    logoUploadStatus.className = 'status-message error';
-    logoPreview.style.display = "none";
-    return;
-  }
-  logoUploadStatus.textContent = 'Загрузка логотипа...';
-  logoUploadStatus.className = 'status-message loading';
-
-  const formData = new FormData();
-  formData.append('file', file);
-
-  try {
-    const res = await fetch(`${BACKEND_URL}/api/upload-logo`, {
-      method: 'POST',
-      body: formData
-    });
-
-    // Проверяем статус ответа
-    if (!res.ok) {
-      let data = {};
-      try { data = await res.json(); } catch {}
-      logoUploadStatus.textContent = `❌ Ошибка: ${data.error || 'Не удалось загрузить логотип.'}`;
-      logoUploadStatus.className = 'status-message error';
-      logoPreview.style.display = "none";
-      return;
-    }
-
-    // Получаем результат
-    const data = await res.json();
-
-    // Проверяем наличие ipfsUrl и корректность ссылки
-    if (typeof data.ipfsUrl === 'string' && /^https?:\/\/.+\/ipfs\/.+$/.test(data.ipfsUrl)) {
-      logoUploadStatus.textContent = `✅ Логотип загружен!`;
-      logoUploadStatus.className = 'status-message success';
-      logoPreview.src = data.ipfsUrl;
-      logoPreview.style.display = "block";
-      window.tokenLogoIpfsUrl = data.ipfsUrl;
-
-      // ---- Загружаем JSON метадату ----
-      await uploadMetadataToPinata(data.ipfsUrl);
-    } else {
-      logoUploadStatus.textContent = `❌ Ошибка: Не удалось получить ссылку на логотип.`;
-      logoUploadStatus.className = 'status-message error';
-      logoPreview.style.display = "none";
-    }
-  } catch (err) {
-    logoUploadStatus.textContent = `❌ Ошибка: ${err.message}`;
-    logoUploadStatus.className = 'status-message error';
-    logoPreview.style.display = "none";
-  }
-});
 
 // ===== Создание токена Solana =====
 document.getElementById('create-token-form').addEventListener('submit', async function(e) {
@@ -160,7 +186,7 @@ document.getElementById('create-token-form').addEventListener('submit', async fu
       createStatusMessage.className = 'status-message success';
       resultLinkDiv.innerHTML = `
         <a href="https://solscan.io/token/${data.mintAddress}?cluster=devnet" target="_blank" style="color: var(--link-color); text-decoration: none;">
-          🔍 Посмотреть транзакцию на Solscan
+          🔍 Посмотреть токен на Solscan
         </a>
       `;
       await fetchServiceWalletInfo();
