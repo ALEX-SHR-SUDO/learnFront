@@ -15,6 +15,7 @@ const serviceBalanceDisplay = document.getElementById('service-balance-display')
 const serviceTokenList = document.getElementById('service-token-list');
 const refreshBtn = document.getElementById('refresh-btn');
 const loadingStatus = document.getElementById('loading-status');
+const tokenDescriptionInput = document.getElementById('token-description');
 
 // Элементы upload логотипа
 const uploadLogoForm = document.getElementById('upload-logo-form');
@@ -24,21 +25,11 @@ const logoPreview = document.getElementById('logo-preview');
 
 // ===== Загрузка метадаты JSON на Pinata =====
 async function uploadMetadataToPinata(ipfsLogoUrl) {
-  // Получаем значения из формы
   const name = tokenNameInput.value || "Token";
   const symbol = tokenSymbolInput.value || "TKN";
-  // Если есть поле description - добавь его в форму, иначе будет пустая строка
-  const descriptionInput = document.getElementById('token-description');
-  const description = descriptionInput ? descriptionInput.value : "";
-
-  // --- Всегда используем публичный gateway ---
-  // ipfsLogoUrl обычно уже публичный, но если нет, заменим домен:
-  const safeIpfsLogoUrl = ipfsLogoUrl.replace(
-    /https:\/\/[^\/]+\/ipfs\//,
-    "https://gateway.pinata.cloud/ipfs/"
-  );
-
-  // Формируем JSON метадаты
+  const description = tokenDescriptionInput ? tokenDescriptionInput.value : "";
+  // Принудительно используем публичный gateway для картинки
+  const safeIpfsLogoUrl = ipfsLogoUrl.replace(/https:\/\/[^\/]+\/ipfs\//, "https://gateway.pinata.cloud/ipfs/");
   const metadata = {
     name: name,
     symbol: symbol,
@@ -47,12 +38,10 @@ async function uploadMetadataToPinata(ipfsLogoUrl) {
     attributes: []
   };
 
-  // Создаём blob из JSON
   const jsonBlob = new Blob([JSON.stringify(metadata)], { type: "application/json" });
   const formData = new FormData();
   formData.append('file', jsonBlob, 'metadata.json');
 
-  // Загружаем JSON на backend -> Pinata
   try {
     const res = await fetch(`${BACKEND_URL}/api/upload-logo`, {
       method: 'POST',
@@ -60,11 +49,8 @@ async function uploadMetadataToPinata(ipfsLogoUrl) {
     });
     const data = await res.json();
     if (res.ok && typeof data.ipfsUrl === "string") {
-      // Автоматически вставляем URI метадаты в форму (заменяем gateway для надёжности)
-      tokenUriInput.value = data.ipfsUrl.replace(
-        /https:\/\/[^\/]+\/ipfs\//,
-        "https://gateway.pinata.cloud/ipfs/"
-      );
+      // Публичный gateway для метадаты
+      tokenUriInput.value = data.ipfsUrl.replace(/https:\/\/[^\/]+\/ipfs\//, "https://gateway.pinata.cloud/ipfs/");
       logoUploadStatus.textContent += '\n✅ Метадата загружена!';
       logoUploadStatus.className = 'status-message success';
     } else {
