@@ -10,7 +10,7 @@ export default function Home() {
   // state
   const [logoStatus, setLogoStatus] = useState("");
   const [logoStatusClass, setLogoStatusClass] = useState("");
-  const [logoPreview, setLogoPreview] = useState("default-logo.svg");
+  const [logoPreview, setLogoPreview] = useState("/default-logo.svg");
   const [tokenUri, setTokenUri] = useState("");
   const [form, setForm] = useState({
     name: "",
