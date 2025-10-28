@@ -1,5 +1,4 @@
 import React, { useRef, useState } from "react";
-import "../styles/style.css";
 
 const BACKEND_URL = "https://learnback-twta.onrender.com";
 
