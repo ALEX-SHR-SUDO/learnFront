@@ -1,0 +1,39 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  text-align: center;
+  padding: 20px;
+}
+
+.heading {
+  font-size: 4rem;
+  margin-bottom: 20px;
+}
+
+.subheading {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.message {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+  color: #666;
+}
+
+.homeLink {
+  padding: 12px 24px;
+  background-color: #0070f3;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.homeLink:hover {
+  background-color: #0051cc;
+}
