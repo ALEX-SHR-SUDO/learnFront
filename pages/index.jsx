@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 
 const BACKEND_URL = "https://learnback-twta.onrender.com";
 
@@ -173,7 +173,7 @@ export default function Home() {
   };
 
   // load wallet balance on mount
-  React.useEffect(() => {
+  useEffect(() => {
     fetchWalletBalance();
   }, []);
 
@@ -349,7 +349,7 @@ export default function Home() {
                 <ul id="service-token-list">
                   {splTokens.map((token, idx) => (
                     <li key={idx}>
-                      {token.symbol || token.mint}: {token.balance} (Mint: {token.mint.slice(0, 6)}...)
+                      {token.symbol || token.mint}: {token.balance} (Mint: {token.mint?.slice(0, 6) || 'N/A'}...)
                     </li>
                   ))}
                 </ul>
