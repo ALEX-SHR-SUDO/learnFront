@@ -177,8 +177,10 @@ export default function Home() {
                 src={logoPreview}
                 alt="Token Logo"
                 className="logo-preview-img"
-                onError={() => {
-                  if (logoPreview !== "/default-logo.svg") {
+                onError={(e) => {
+                  const currentSrc = e.target.src;
+                  if (!currentSrc.endsWith("/default-logo.svg")) {
+                    e.target.src = "/default-logo.svg";
                     setLogoPreview("/default-logo.svg");
                     setLogoStatus("Логотип не найден, используется дефолтный.");
                     setLogoStatusClass("status-message error");
