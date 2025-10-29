@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 
 const BACKEND_URL = "https://learnback-twta.onrender.com";
 
@@ -22,6 +22,10 @@ export default function Home() {
   const [submitStatus, setSubmitStatus] = useState("");
   const [submitStatusClass, setSubmitStatusClass] = useState("");
   const [resultLink, setResultLink] = useState("");
+  const [walletAddress, setWalletAddress] = useState("");
+  const [solBalance, setSolBalance] = useState("");
+  const [splTokens, setSplTokens] = useState([]);
+  const [walletLoading, setWalletLoading] = useState(false);
 
   // logo upload handler
   const handleLogoUpload = async (file) => {
@@ -147,6 +151,31 @@ export default function Home() {
       setSubmitStatusClass("status-message error");
     }
   };
+
+  // fetch wallet balance
+  const fetchWalletBalance = async () => {
+    setWalletLoading(true);
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/wallet-balance`);
+      const data = await res.json();
+      if (res.ok) {
+        setWalletAddress(data.walletAddress || "");
+        setSolBalance(data.solBalance || "0");
+        setSplTokens(data.tokens || []);
+      } else {
+        console.error("Ошибка загрузки баланса:", data.error);
+      }
+    } catch (err) {
+      console.error("Ошибка загрузки баланса:", err.message);
+    } finally {
+      setWalletLoading(false);
+    }
+  };
+
+  // load wallet balance on mount
+  useEffect(() => {
+    fetchWalletBalance();
+  }, []);
 
   // drag&drop
   const handleDrop = (e) => {
@@ -300,7 +329,42 @@ export default function Home() {
           </div>
         </div>
       </form>
-      {/* wallet-section можно добавить аналогично */}
+      <div className="wallet-section">
+        <h3 style={{ marginTop: 0, marginBottom: 12 }}>Сервисный кошелек</h3>
+        {walletLoading ? (
+          <div id="loading-status">Загрузка...</div>
+        ) : (
+          <>
+            <div id="service-wallet-address">
+              <strong>Адрес:</strong> {walletAddress || "Не загружен"}
+            </div>
+            <div id="service-balance-display">
+              <strong>Баланс SOL:</strong> {solBalance} SOL
+            </div>
+            {splTokens.length > 0 && (
+              <>
+                <div style={{ marginTop: 12, marginBottom: 8 }}>
+                  <strong>SPL токены:</strong>
+                </div>
+                <ul id="service-token-list">
+                  {splTokens.map((token, idx) => (
+                    <li key={idx}>
+                      {token.symbol || token.mint}: {token.balance} (Mint: {token.mint?.slice(0, 6) || 'N/A'}...)
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+            <button
+              className="refresh-btn"
+              onClick={fetchWalletBalance}
+              disabled={walletLoading}
+            >
+              🔄 Обновить баланс
+            </button>
+          </>
+        )}
+      </div>
     </main>
   );
 }
