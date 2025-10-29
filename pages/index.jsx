@@ -158,13 +158,11 @@ export default function Home() {
     try {
       const res = await fetch(`${BACKEND_URL}/api/wallet-balance`);
       const data = await res.json();
-      console.log("API Response:", data); // Debug log
       if (res.ok) {
         setWalletAddress(data.walletAddress || "");
         setSolBalance(data.solBalance || "0");
         // Handle both 'tokens' and 'splTokens' field names for compatibility
         const tokens = data.tokens || data.splTokens || [];
-        console.log("Setting SPL tokens:", tokens.length, "tokens"); // Debug log
         setSplTokens(tokens);
       } else {
         console.error("Ошибка загрузки баланса:", data.error);
