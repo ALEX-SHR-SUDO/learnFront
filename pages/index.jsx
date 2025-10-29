@@ -28,7 +28,7 @@ export default function Home() {
     if (!file) {
       setLogoStatus("Выберите файл!");
       setLogoStatusClass("status-message error");
-      setLogoPreview("default-logo.svg");
+      setLogoPreview("/default-logo.svg");
       return;
     }
     setLogoStatus("Загрузка логотипа...");
@@ -46,7 +46,7 @@ export default function Home() {
       if (!res.ok) {
         setLogoStatus(`Ошибка: ${data.error || "Не удалось загрузить логотип."}`);
         setLogoStatusClass("status-message error");
-        setLogoPreview("default-logo.svg");
+        setLogoPreview("/default-logo.svg");
         return;
       }
       // IPFS Gateway
@@ -61,7 +61,7 @@ export default function Home() {
     } catch (err) {
       setLogoStatus(`Ошибка: ${err.message}`);
       setLogoStatusClass("status-message error");
-      setLogoPreview("default-logo.svg");
+      setLogoPreview("/default-logo.svg");
     }
   };
 
@@ -177,6 +177,11 @@ export default function Home() {
                 src={logoPreview}
                 alt="Token Logo"
                 className="logo-preview-img"
+                onError={() => {
+                  setLogoPreview("/default-logo.svg");
+                  setLogoStatus("Логотип не найден, используется дефолтный.");
+                  setLogoStatusClass("status-message error");
+                }}
               />
               <span className="logo-upload-text">Загрузить логотип</span>
               <input
