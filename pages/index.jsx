@@ -161,7 +161,9 @@ export default function Home() {
       if (res.ok) {
         setWalletAddress(data.walletAddress || "");
         setSolBalance(data.solBalance || "0");
-        setSplTokens(data.tokens || []);
+        // Handle both 'tokens' and 'splTokens' field names for compatibility
+        const tokens = data.tokens || data.splTokens || [];
+        setSplTokens(tokens);
       } else {
         console.error("Ошибка загрузки баланса:", data.error);
       }
@@ -341,10 +343,10 @@ export default function Home() {
             <div id="service-balance-display">
               <strong>Баланс SOL:</strong> {solBalance} SOL
             </div>
-            {splTokens.length > 0 && (
+            {splTokens.length > 0 ? (
               <>
                 <div style={{ marginTop: 12, marginBottom: 8 }}>
-                  <strong>SPL токены:</strong>
+                  <strong>SPL токены ({splTokens.length}):</strong>
                 </div>
                 <ul id="service-token-list">
                   {splTokens.map((token, idx) => (
@@ -354,6 +356,12 @@ export default function Home() {
                   ))}
                 </ul>
               </>
+            ) : (
+              walletAddress && (
+                <div style={{ marginTop: 12, fontSize: '14px', color: '#888' }}>
+                  SPL токены не найдены
+                </div>
+              )
             )}
             <button
               className="refresh-btn"
