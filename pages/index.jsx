@@ -178,9 +178,11 @@ export default function Home() {
                 alt="Token Logo"
                 className="logo-preview-img"
                 onError={() => {
-                  setLogoPreview("/default-logo.svg");
-                  setLogoStatus("Логотип не найден, используется дефолтный.");
-                  setLogoStatusClass("status-message error");
+                  if (logoPreview !== "/default-logo.svg") {
+                    setLogoPreview("/default-logo.svg");
+                    setLogoStatus("Логотип не найден, используется дефолтный.");
+                    setLogoStatusClass("status-message error");
+                  }
                 }}
               />
               <span className="logo-upload-text">Загрузить логотип</span>
