@@ -1,7 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 
 const BACKEND_URL = "https://learnback-twta.onrender.com";
-const LAMPORTS_PER_SOL = 1_000_000_000;
 
 export default function Home() {
   // refs
