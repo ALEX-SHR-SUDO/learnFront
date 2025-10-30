@@ -348,7 +348,7 @@ export default function Home() {
                   href={`https://solscan.io/account/${walletAddress}?cluster=devnet`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: "var(--link-color, #007bff)", textDecoration: "none" }}
+                  style={{ color: "var(--link-color)", textDecoration: "none" }}
                 >
                   {walletAddress}
                 </a>
