@@ -220,7 +220,8 @@ export default function Home() {
                 className="logo-preview-img"
                 onError={(e) => {
                   const currentSrc = e.target.src;
-                  // Only reset to default if it's not already default and not a data URL (local preview)
+                  // Don't reset data URLs (local file previews from FileReader) since they're generated locally
+                  // and don't need fallback handling. Only reset when external URLs (IPFS, etc.) fail to load.
                   if (!currentSrc.endsWith("/default-logo.svg") && !currentSrc.startsWith("data:")) {
                     e.target.src = "/default-logo.svg";
                     setLogoPreview("/default-logo.svg");
