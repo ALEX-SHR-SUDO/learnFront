@@ -161,7 +161,7 @@ export default function Home() {
       if (res.ok) {
         setWalletAddress(data.walletAddress || "");
         // Balance is already in SOL from backend
-        const balanceInSol = parseFloat(data.solBalance) || 0;
+        const balanceInSol = parseFloat(data.sol) || 0;
         setSolBalance(balanceInSol.toFixed(9));
         // Handle both 'tokens' and 'splTokens' field names for compatibility
         const tokens = data.tokens || data.splTokens || [];
