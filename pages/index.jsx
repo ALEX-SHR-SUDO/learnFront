@@ -220,7 +220,8 @@ export default function Home() {
                 className="logo-preview-img"
                 onError={(e) => {
                   const currentSrc = e.target.src;
-                  if (!currentSrc.endsWith("/default-logo.svg")) {
+                  // Only reset to default if it's not already default and not a data URL (local preview)
+                  if (!currentSrc.endsWith("/default-logo.svg") && !currentSrc.startsWith("data:")) {
                     e.target.src = "/default-logo.svg";
                     setLogoPreview("/default-logo.svg");
                     setLogoStatus("Логотип не найден, используется дефолтный.");
