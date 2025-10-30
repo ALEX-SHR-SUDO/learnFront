@@ -341,8 +341,20 @@ export default function Home() {
           <div id="loading-status">Загрузка...</div>
         ) : (
           <>
-            <div id="service-wallet-address">
-              <strong>Адрес:</strong> {walletAddress || "Не загружен"}
+            <div id="service-wallet-address" style={{ marginBottom: 8 }}>
+              <strong>Адрес:</strong>{" "}
+              {walletAddress ? (
+                <a
+                  href={`https://solscan.io/account/${walletAddress}?cluster=devnet`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "var(--link-color, #007bff)", textDecoration: "none" }}
+                >
+                  {walletAddress}
+                </a>
+              ) : (
+                "Не загружен"
+              )}
             </div>
             <div id="service-balance-display">
               <strong>Баланс SOL:</strong> {solBalance} SOL
