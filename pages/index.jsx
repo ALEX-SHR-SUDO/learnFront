@@ -160,7 +160,10 @@ export default function Home() {
       const data = await res.json();
       if (res.ok) {
         setWalletAddress(data.walletAddress || "");
-        setSolBalance(data.solBalance || "0");
+        // Convert lamports to SOL (1 SOL = 1,000,000,000 lamports)
+        const balanceInLamports = parseFloat(data.solBalance) || 0;
+        const balanceInSol = balanceInLamports / 1e9;
+        setSolBalance(balanceInSol.toFixed(9));
         // Handle both 'tokens' and 'splTokens' field names for compatibility
         const tokens = data.tokens || data.splTokens || [];
         setSplTokens(tokens);
