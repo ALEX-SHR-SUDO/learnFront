@@ -1,7 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 
 const BACKEND_URL = "https://learnback-twta.onrender.com";
-const LAMPORTS_PER_SOL = 1_000_000_000;
 
 export default function Home() {
   // refs
@@ -161,9 +160,8 @@ export default function Home() {
       const data = await res.json();
       if (res.ok) {
         setWalletAddress(data.walletAddress || "");
-        // Convert lamports to SOL (1 SOL = 1,000,000,000 lamports)
-        const balanceInLamports = parseFloat(data.solBalance) || 0;
-        const balanceInSol = balanceInLamports / LAMPORTS_PER_SOL;
+        // Balance is already in SOL from backend
+        const balanceInSol = parseFloat(data.solBalance) || 0;
         setSolBalance(balanceInSol.toFixed(9));
         // Handle both 'tokens' and 'splTokens' field names for compatibility
         const tokens = data.tokens || data.splTokens || [];
