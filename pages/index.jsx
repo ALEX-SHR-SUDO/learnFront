@@ -35,6 +35,14 @@ export default function Home() {
       setLogoPreview("/default-logo.svg");
       return;
     }
+
+    // Локальный предпросмотр (до загрузки на сервер)
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setLogoPreview(reader.result); // Показываем выбранное изображение сразу
+    };
+    reader.readAsDataURL(file);
+
     setLogoStatus("Загрузка логотипа...");
     setLogoStatusClass("status-message loading");
 
@@ -60,7 +68,7 @@ export default function Home() {
       );
       setLogoStatus("Логотип загружен!");
       setLogoStatusClass("status-message success");
-      setLogoPreview(ipfsUrl);
+      setLogoPreview(ipfsUrl); // После загрузки показываем ссылку из IPFS
       await uploadMetadataToPinata(ipfsUrl);
     } catch (err) {
       setLogoStatus(`Ошибка: ${err.message}`);
