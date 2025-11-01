@@ -252,10 +252,6 @@ export default function Home() {
             <label
               htmlFor="logo-file"
               className="logo-label"
-              onClick={() => {
-                console.log('[LOG] logo-label clicked');
-                logoFileInput.current.click();
-              }}
             >
               <img
                 id="logo-preview"
