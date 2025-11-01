@@ -29,22 +29,31 @@ export default function Home() {
 
   // logo upload handler
   const handleLogoUpload = async (file) => {
+    console.log('[LOG] handleLogoUpload called. File:', file);
+
     if (!file) {
       setLogoStatus("Выберите файл!");
       setLogoStatusClass("status-message error");
       setLogoPreview("/default-logo.svg");
+      console.log('[LOG] handleLogoUpload: No file selected');
       return;
     }
 
     // Локальный предпросмотр (до загрузки на сервер)
     const reader = new FileReader();
     reader.onloadend = () => {
+      console.log('[LOG] FileReader loaded. Result:', reader.result);
       setLogoPreview(reader.result); // Показываем выбранное изображение сразу
+      console.log('[LOG] setLogoPreview called with local file');
+    };
+    reader.onerror = (e) => {
+      console.error('[ERROR] FileReader error:', e);
     };
     reader.readAsDataURL(file);
 
     setLogoStatus("Загрузка логотипа...");
     setLogoStatusClass("status-message loading");
+    console.log('[LOG] Status set: Загрузка логотипа...');
 
     const formData = new FormData();
     formData.append("file", file);
@@ -54,11 +63,15 @@ export default function Home() {
         method: "POST",
         body: formData,
       });
+      console.log('[LOG] upload-logo fetch result:', res);
       const data = await res.json();
+      console.log('[LOG] upload-logo response data:', data);
+
       if (!res.ok) {
         setLogoStatus(`Ошибка: ${data.error || "Не удалось загрузить логотип."}`);
         setLogoStatusClass("status-message error");
         setLogoPreview("/default-logo.svg");
+        console.log('[ERROR] upload-logo: Bad response', data);
         return;
       }
       // IPFS Gateway
@@ -69,16 +82,20 @@ export default function Home() {
       setLogoStatus("Логотип загружен!");
       setLogoStatusClass("status-message success");
       setLogoPreview(ipfsUrl); // После загрузки показываем ссылку из IPFS
+      console.log('[LOG] setLogoPreview called with IPFS url:', ipfsUrl);
       await uploadMetadataToPinata(ipfsUrl);
     } catch (err) {
       setLogoStatus(`Ошибка: ${err.message}`);
       setLogoStatusClass("status-message error");
       setLogoPreview("/default-logo.svg");
+      console.error('[ERROR] Exception in upload-logo:', err);
     }
   };
 
   // metadata upload
   const uploadMetadataToPinata = async (ipfsLogoUrl) => {
+    console.log('[LOG] uploadMetadataToPinata called. ipfsLogoUrl:', ipfsLogoUrl);
+
     const metadata = {
       name: form.name || "Token",
       symbol: form.symbol || "TKN",
@@ -94,23 +111,28 @@ export default function Home() {
         method: "POST",
         body: formData,
       });
+      console.log('[LOG] metadata upload fetch result:', res);
       const data = await res.json();
+      console.log('[LOG] metadata upload response data:', data);
+
       if (res.ok && typeof data.ipfsUrl === "string") {
-        setTokenUri(
-          data.ipfsUrl.replace(
-            /https:\/\/[^\/]+\/ipfs\//,
-            "https://gateway.pinata.cloud/ipfs/"
-          )
+        const metadataUri = data.ipfsUrl.replace(
+          /https:\/\/[^\/]+\/ipfs\//,
+          "https://gateway.pinata.cloud/ipfs/"
         );
+        setTokenUri(metadataUri);
+        console.log('[LOG] setTokenUri called:', metadataUri);
         setLogoStatus((msg) => msg + "\nМетадата загружена!");
         setLogoStatusClass("status-message success");
       } else {
         setLogoStatus(`Ошибка загрузки метадаты: ${data.error || "Нет ссылки"}`);
         setLogoStatusClass("status-message error");
+        console.error('[ERROR] metadata upload: Bad response', data);
       }
     } catch (err) {
       setLogoStatus(`Ошибка загрузки метадаты: ${err.message}`);
       setLogoStatusClass("status-message error");
+      console.error('[ERROR] Exception in metadata upload:', err);
     }
   };
 
@@ -119,18 +141,23 @@ export default function Home() {
     e.preventDefault();
     setSubmitStatus("");
     setResultLink("");
+    console.log('[LOG] handleSubmit called. form:', form, 'tokenUri:', tokenUri);
+
     if (!form.name || !form.symbol || !tokenUri) {
       setSubmitStatus("Заполните все поля метаданных (Имя, Символ, URI).");
       setSubmitStatusClass("status-message error");
+      console.log('[ERROR] Submit: Not all metadata fields filled');
       return;
     }
     if (!form.supply || parseInt(form.supply) <= 0) {
       setSubmitStatus("Заполните количество (Supply).");
       setSubmitStatusClass("status-message error");
+      console.log('[ERROR] Submit: Supply field not filled or invalid');
       return;
     }
     setSubmitStatus("Создание и минт токена, подождите...");
     setSubmitStatusClass("status-message loading");
+    console.log('[LOG] Submit started');
 
     try {
       const res = await fetch(`${BACKEND_URL}/api/create-token`, {
@@ -144,36 +171,44 @@ export default function Home() {
           uri: tokenUri,
         }),
       });
+      console.log('[LOG] create-token fetch result:', res);
       const data = await res.json();
+      console.log('[LOG] create-token response data:', data);
+
       if (res.ok) {
         setSubmitStatus(`Токен создан! Mint: ${data.mintAddress.slice(0, 6)}...`);
         setSubmitStatusClass("status-message success");
         setResultLink(
           `<a href="https://solscan.io/token/${data.mintAddress}?cluster=devnet" target="_blank" style="color: var(--link-color); text-decoration: none;">🔍 Посмотреть токен на Solscan</a>`
         );
+        console.log('[LOG] Token created! Mint:', data.mintAddress);
       } else {
         throw new Error(data.error || "Неизвестная ошибка сервера.");
       }
     } catch (error) {
       setSubmitStatus(`Ошибка: ${error.message}`);
       setSubmitStatusClass("status-message error");
+      console.error('[ERROR] Exception in create-token:', error);
     }
   };
 
   // fetch wallet balance
   const fetchWalletBalance = async () => {
     setWalletLoading(true);
+    console.log('[LOG] fetchWalletBalance called');
     try {
       const res = await fetch(`${BACKEND_URL}/api/wallet-balance`);
+      console.log('[LOG] wallet-balance fetch result:', res);
       const data = await res.json();
+      console.log('[LOG] wallet-balance response data:', data);
+
       if (res.ok) {
         setWalletAddress(data.walletAddress || "");
-        // Balance is already in SOL from backend
         const balanceInSol = parseFloat(data.sol) || 0;
         setSolBalance(balanceInSol.toFixed(9));
-        // Handle both 'tokens' and 'splTokens' field names for compatibility
         const tokens = data.tokens || data.splTokens || [];
         setSplTokens(tokens);
+        console.log('[LOG] Wallet data set:', data.walletAddress, balanceInSol, tokens);
       } else {
         console.error("Ошибка загрузки баланса:", data.error);
       }
@@ -193,6 +228,7 @@ export default function Home() {
   const handleDrop = (e) => {
     e.preventDefault();
     const files = e.dataTransfer.files;
+    console.log('[LOG] handleDrop called. files:', files);
     if (files && files[0]) handleLogoUpload(files[0]);
   };
   const handleDragOver = (e) => e.preventDefault();
@@ -210,7 +246,10 @@ export default function Home() {
             <label
               htmlFor="logo-file"
               className="logo-label"
-              onClick={() => logoFileInput.current.click()}
+              onClick={() => {
+                console.log('[LOG] logo-label clicked');
+                logoFileInput.current.click();
+              }}
             >
               <img
                 id="logo-preview"
@@ -220,6 +259,7 @@ export default function Home() {
                 className="logo-preview-img"
                 onError={(e) => {
                   const currentSrc = e.target.src;
+                  console.error('[ERROR] img onError triggered. src:', currentSrc);
                   // Don't reset data URLs (local file previews from FileReader) since they're generated locally
                   // and don't need fallback handling. Only reset when external URLs (IPFS, etc.) fail to load.
                   if (!currentSrc.endsWith("/default-logo.svg") && !currentSrc.startsWith("data:")) {
@@ -227,6 +267,7 @@ export default function Home() {
                     setLogoPreview("/default-logo.svg");
                     setLogoStatus("Логотип не найден, используется дефолтный.");
                     setLogoStatusClass("status-message error");
+                    console.log('[LOG] setLogoPreview called with default-logo.svg');
                   }
                 }}
               />
@@ -238,12 +279,16 @@ export default function Home() {
                 style={{ display: "none" }}
                 ref={logoFileInput}
                 onChange={(e) => {
+                  console.log('[LOG] logo-file onChange. files:', e.target.files);
                   if (e.target.files[0]) handleLogoUpload(e.target.files[0]);
                 }}
               />
             </label>
             <div id="logo-upload-status" className={logoStatusClass}>
               {logoStatus}
+            </div>
+            <div style={{marginTop: "10px", fontSize: "13px", color: "#888"}}>
+              [LOG] logoPreview: {logoPreview ? logoPreview.slice(0, 60) : "null"}
             </div>
           </div>
           <div className="fields-block">
@@ -256,7 +301,10 @@ export default function Home() {
                 placeholder="Например: Orion"
                 value={form.name}
                 onChange={(e) =>
-                  setForm((f) => ({ ...f, name: e.target.value }))
+                  setForm((f) => {
+                    console.log('[LOG] token-name changed:', e.target.value);
+                    return { ...f, name: e.target.value };
+                  })
                 }
               />
             </label>
@@ -269,7 +317,10 @@ export default function Home() {
                 placeholder="Например: ORN"
                 value={form.symbol}
                 onChange={(e) =>
-                  setForm((f) => ({ ...f, symbol: e.target.value }))
+                  setForm((f) => {
+                    console.log('[LOG] token-symbol changed:', e.target.value);
+                    return { ...f, symbol: e.target.value };
+                  })
                 }
               />
             </label>
@@ -281,7 +332,10 @@ export default function Home() {
                 placeholder="Краткое описание токена"
                 value={form.description}
                 onChange={(e) =>
-                  setForm((f) => ({ ...f, description: e.target.value }))
+                  setForm((f) => {
+                    console.log('[LOG] token-description changed:', e.target.value);
+                    return { ...f, description: e.target.value };
+                  })
                 }
               />
             </label>
@@ -295,7 +349,10 @@ export default function Home() {
                 placeholder="1000000"
                 value={form.supply}
                 onChange={(e) =>
-                  setForm((f) => ({ ...f, supply: e.target.value }))
+                  setForm((f) => {
+                    console.log('[LOG] token-supply changed:', e.target.value);
+                    return { ...f, supply: e.target.value };
+                  })
                 }
               />
             </label>
@@ -309,10 +366,13 @@ export default function Home() {
                 step={1}
                 value={form.decimals}
                 onChange={(e) =>
-                  setForm((f) => ({
-                    ...f,
-                    decimals: Number(e.target.value),
-                  }))
+                  setForm((f) => {
+                    console.log('[LOG] token-decimals changed:', e.target.value);
+                    return {
+                      ...f,
+                      decimals: Number(e.target.value),
+                    };
+                  })
                 }
               />
             </label>
