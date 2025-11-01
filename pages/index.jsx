@@ -233,6 +233,12 @@ export default function Home() {
   };
   const handleDragOver = (e) => e.preventDefault();
 
+  // input change handler for file upload (важно!)
+  const onLogoInputChange = (e) => {
+    console.log('[LOG] logo-file onChange. files:', e.target.files);
+    if (e.target.files[0]) handleLogoUpload(e.target.files[0]);
+  };
+
   return (
     <main>
       <form id="create-token-form" className="token-form" onSubmit={handleSubmit}>
@@ -278,10 +284,7 @@ export default function Home() {
                 accept="image/*"
                 style={{ display: "none" }}
                 ref={logoFileInput}
-                onChange={(e) => {
-                  console.log('[LOG] logo-file onChange. files:', e.target.files);
-                  if (e.target.files[0]) handleLogoUpload(e.target.files[0]);
-                }}
+                onChange={onLogoInputChange}
               />
             </label>
             <div id="logo-upload-status" className={logoStatusClass}>
