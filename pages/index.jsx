@@ -11,6 +11,7 @@ export default function Home() {
   const [logoStatus, setLogoStatus] = useState("");
   const [logoStatusClass, setLogoStatusClass] = useState("");
   const [logoPreview, setLogoPreview] = useState("/default-logo.svg");
+  const [logoIpfsUrl, setLogoIpfsUrl] = useState(""); // Store logo IPFS URL
   const [tokenUri, setTokenUri] = useState("");
   const [form, setForm] = useState({
     name: "",
@@ -82,8 +83,8 @@ export default function Home() {
       setLogoStatus("Логотип загружен!");
       setLogoStatusClass("status-message success");
       setLogoPreview(ipfsUrl); // После загрузки показываем ссылку из IPFS
-      console.log('[LOG] setLogoPreview called with IPFS url:', ipfsUrl);
-      await uploadMetadataToPinata(ipfsUrl);
+      setLogoIpfsUrl(ipfsUrl); // Save IPFS URL for metadata upload later
+      console.log('[LOG] Logo IPFS URL saved:', ipfsUrl);
     } catch (err) {
       setLogoStatus(`Ошибка: ${err.message}`);
       setLogoStatusClass("status-message error");
@@ -106,33 +107,26 @@ export default function Home() {
     const jsonBlob = new Blob([JSON.stringify(metadata)], { type: "application/json" });
     const formData = new FormData();
     formData.append("file", jsonBlob, "metadata.json");
-    try {
-      const res = await fetch(`${BACKEND_URL}/api/upload-logo`, {
-        method: "POST",
-        body: formData,
-      });
-      console.log('[LOG] metadata upload fetch result:', res);
-      const data = await res.json();
-      console.log('[LOG] metadata upload response data:', data);
+    
+    const res = await fetch(`${BACKEND_URL}/api/upload-logo`, {
+      method: "POST",
+      body: formData,
+    });
+    console.log('[LOG] metadata upload fetch result:', res);
+    const data = await res.json();
+    console.log('[LOG] metadata upload response data:', data);
 
-      if (res.ok && typeof data.ipfsUrl === "string") {
-        const metadataUri = data.ipfsUrl.replace(
-          /https:\/\/[^\/]+\/ipfs\//,
-          "https://gateway.pinata.cloud/ipfs/"
-        );
-        setTokenUri(metadataUri);
-        console.log('[LOG] setTokenUri called:', metadataUri);
-        setLogoStatus((msg) => msg + "\nМетадата загружена!");
-        setLogoStatusClass("status-message success");
-      } else {
-        setLogoStatus(`Ошибка загрузки метадаты: ${data.error || "Нет ссылки"}`);
-        setLogoStatusClass("status-message error");
-        console.error('[ERROR] metadata upload: Bad response', data);
-      }
-    } catch (err) {
-      setLogoStatus(`Ошибка загрузки метадаты: ${err.message}`);
-      setLogoStatusClass("status-message error");
-      console.error('[ERROR] Exception in metadata upload:', err);
+    if (res.ok && typeof data.ipfsUrl === "string") {
+      const metadataUri = data.ipfsUrl.replace(
+        /https:\/\/[^\/]+\/ipfs\//,
+        "https://gateway.pinata.cloud/ipfs/"
+      );
+      setTokenUri(metadataUri);
+      console.log('[LOG] setTokenUri called:', metadataUri);
+      setSubmitStatus((msg) => msg + "\nМетадата загружена!");
+      setSubmitStatusClass("status-message success");
+    } else {
+      throw new Error(data.error || "Нет ссылки на метадату");
     }
   };
 
@@ -141,10 +135,10 @@ export default function Home() {
     e.preventDefault();
     setSubmitStatus("");
     setResultLink("");
-    console.log('[LOG] handleSubmit called. form:', form, 'tokenUri:', tokenUri);
+    console.log('[LOG] handleSubmit called. form:', form, 'logoIpfsUrl:', logoIpfsUrl);
 
-    if (!form.name || !form.symbol || !tokenUri) {
-      setSubmitStatus("Заполните все поля метаданных (Имя, Символ, URI).");
+    if (!form.name || !form.symbol) {
+      setSubmitStatus("Заполните все поля метаданных (Имя, Символ).");
       setSubmitStatusClass("status-message error");
       console.log('[ERROR] Submit: Not all metadata fields filled');
       return;
@@ -155,9 +149,40 @@ export default function Home() {
       console.log('[ERROR] Submit: Supply field not filled or invalid');
       return;
     }
+    if (!logoIpfsUrl) {
+      setSubmitStatus("Сначала загрузите логотип.");
+      setSubmitStatusClass("status-message error");
+      console.log('[ERROR] Submit: Logo not uploaded');
+      return;
+    }
+
+    setSubmitStatus("Загрузка метадаты...");
+    setSubmitStatusClass("status-message loading");
+    console.log('[LOG] Submit started - uploading metadata');
+
+    // Upload metadata first
+    try {
+      await uploadMetadataToPinata(logoIpfsUrl);
+    } catch (err) {
+      setSubmitStatus(`Ошибка загрузки метадаты: ${err.message}`);
+      setSubmitStatusClass("status-message error");
+      console.error('[ERROR] Exception in metadata upload:', err);
+      return;
+    }
+
+    // Wait briefly to ensure tokenUri is set
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    if (!tokenUri) {
+      setSubmitStatus("Ошибка: URI метадаты не был установлен.");
+      setSubmitStatusClass("status-message error");
+      console.log('[ERROR] Submit: tokenUri not set after metadata upload');
+      return;
+    }
+
     setSubmitStatus("Создание и минт токена, подождите...");
     setSubmitStatusClass("status-message loading");
-    console.log('[LOG] Submit started');
+    console.log('[LOG] Creating token with URI:', tokenUri);
 
     try {
       const res = await fetch(`${BACKEND_URL}/api/create-token`, {
