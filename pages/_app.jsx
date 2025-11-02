@@ -42,7 +42,7 @@ export default function App({ Component, pageProps }) {
       const saved = localStorage.getItem('backgroundTheme');
       if (saved !== null) {
         const index = parseInt(saved, 10);
-        if (index >= 0 && index < backgrounds.length) {
+        if (!isNaN(index) && index >= 0 && index < backgrounds.length) {
           setCurrentBgIndex(index);
         }
       }
