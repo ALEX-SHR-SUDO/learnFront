@@ -112,19 +112,20 @@ export default function Home() {
       method: "POST",
       body: formData,
     });
-    console.log('[LOG] metadata upload fetch result:', res);
+    console.log('[LOG] metadata upload to IPFS - fetch result:', res);
     const data = await res.json();
-    console.log('[LOG] metadata upload response data:', data);
+    console.log('[LOG] metadata upload to IPFS - response data:', data);
 
     if (res.ok && typeof data.ipfsUrl === "string") {
       const metadataUri = data.ipfsUrl.replace(
         /https:\/\/[^\/]+\/ipfs\//,
         "https://gateway.pinata.cloud/ipfs/"
       );
-      setTokenUri(metadataUri);
-      console.log('[LOG] setTokenUri called:', metadataUri);
+      console.log('[LOG] Metadata URI created:', metadataUri);
       setSubmitStatus("Метадата загружена! Создание токена...");
       setSubmitStatusClass("status-message success");
+      // Also update tokenUri state for display in the read-only URI field
+      setTokenUri(metadataUri);
       return metadataUri;
     } else {
       throw new Error(data.error || "Нет ссылки на метадату");
