@@ -286,9 +286,6 @@ export default function Home() {
             <div id="logo-upload-status" className={logoStatusClass}>
               {logoStatus}
             </div>
-            <div style={{marginTop: "10px", fontSize: "13px", color: "#888"}}>
-              [LOG] logoPreview: {logoPreview ? logoPreview.slice(0, 60) : "null"}
-            </div>
           </div>
           <div className="fields-block">
             <label>
