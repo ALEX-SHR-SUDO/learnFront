@@ -123,8 +123,9 @@ export default function Home() {
       );
       setTokenUri(metadataUri);
       console.log('[LOG] setTokenUri called:', metadataUri);
-      setSubmitStatus((msg) => msg + "\nМетадата загружена!");
+      setSubmitStatus("Метадата загружена! Создание токена...");
       setSubmitStatusClass("status-message success");
+      return metadataUri;
     } else {
       throw new Error(data.error || "Нет ссылки на метадату");
     }
@@ -161,8 +162,9 @@ export default function Home() {
     console.log('[LOG] Submit started - uploading metadata');
 
     // Upload metadata first
+    let metadataUri;
     try {
-      await uploadMetadataToPinata(logoIpfsUrl);
+      metadataUri = await uploadMetadataToPinata(logoIpfsUrl);
     } catch (err) {
       setSubmitStatus(`Ошибка загрузки метадаты: ${err.message}`);
       setSubmitStatusClass("status-message error");
@@ -170,19 +172,16 @@ export default function Home() {
       return;
     }
 
-    // Wait briefly to ensure tokenUri is set
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    if (!tokenUri) {
+    if (!metadataUri) {
       setSubmitStatus("Ошибка: URI метадаты не был установлен.");
       setSubmitStatusClass("status-message error");
-      console.log('[ERROR] Submit: tokenUri not set after metadata upload');
+      console.log('[ERROR] Submit: metadataUri not returned from upload');
       return;
     }
 
     setSubmitStatus("Создание и минт токена, подождите...");
     setSubmitStatusClass("status-message loading");
-    console.log('[LOG] Creating token with URI:', tokenUri);
+    console.log('[LOG] Creating token with URI:', metadataUri);
 
     try {
       const res = await fetch(`${BACKEND_URL}/api/create-token`, {
@@ -193,7 +192,7 @@ export default function Home() {
           symbol: form.symbol,
           supply: form.supply,
           decimals: form.decimals,
-          uri: tokenUri,
+          uri: metadataUri,
         }),
       });
       console.log('[LOG] create-token fetch result:', res);
