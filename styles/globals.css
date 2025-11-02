@@ -3,6 +3,58 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Segoe UI', Arial, sans-serif;
-  background: #fff;
+  /* Crypto-themed gradient background */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
+  background-attachment: fixed;
   color: #222;
+  min-height: 100vh;
 }
+
+/* Alternative crypto backgrounds - uncomment to use:
+
+Option 1: Bitcoin Orange & Blue gradient
+body {
+  background: linear-gradient(135deg, #f7931a 0%, #4a90e2 50%, #1a1a2e 100%);
+  background-attachment: fixed;
+}
+
+Option 2: Ethereum Purple gradient
+body {
+  background: linear-gradient(135deg, #8a2be2 0%, #4b0082 50%, #000000 100%);
+  background-attachment: fixed;
+}
+
+Option 3: Cyberpunk Crypto theme
+body {
+  background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+  background-attachment: fixed;
+}
+
+Option 4: Matrix green crypto
+body {
+  background: linear-gradient(135deg, #000000 0%, #0f4c0f 50%, #00ff00 100%);
+  background-attachment: fixed;
+}
+
+Option 5: Gold & Dark crypto theme
+body {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 25%, #c9a227 50%, #2d2d2d 75%, #1a1a1a 100%);
+  background-attachment: fixed;
+}
+
+Option 6: Neon Blue crypto
+body {
+  background: linear-gradient(135deg, #000428 0%, #004e92 50%, #00d4ff 100%);
+  background-attachment: fixed;
+}
+
+Option 7: Animated blockchain pattern
+body {
+  background: #0a0e27;
+  background-image: 
+    repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.05) 35px, rgba(255,255,255,.05) 70px),
+    linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-attachment: fixed;
+}
+
+*/
