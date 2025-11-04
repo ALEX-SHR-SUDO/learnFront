@@ -19,6 +19,8 @@ export default function Home() {
     description: "",
     supply: "",
     decimals: 9,
+    revokeFreezeAuthority: false,
+    revokeMintAuthority: false,
   });
   const [submitStatus, setSubmitStatus] = useState("");
   const [submitStatusClass, setSubmitStatusClass] = useState("");
@@ -194,6 +196,8 @@ export default function Home() {
           supply: form.supply,
           decimals: form.decimals,
           uri: metadataUri,
+          revokeFreezeAuthority: form.revokeFreezeAuthority,
+          revokeMintAuthority: form.revokeMintAuthority,
         }),
       });
       console.log('[LOG] create-token fetch result:', res);
@@ -396,6 +400,42 @@ export default function Home() {
                   })
                 }
               />
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                id="revoke-freeze-authority"
+                checked={form.revokeFreezeAuthority}
+                onChange={(e) =>
+                  setForm((f) => {
+                    console.log('[LOG] revoke-freeze-authority changed:', e.target.checked);
+                    return {
+                      ...f,
+                      revokeFreezeAuthority: e.target.checked,
+                    };
+                  })
+                }
+                style={{ width: 'auto', cursor: 'pointer' }}
+              />
+              <span>Отозвать права на заморозку (Revoke Freeze Authority)</span>
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                id="revoke-mint-authority"
+                checked={form.revokeMintAuthority}
+                onChange={(e) =>
+                  setForm((f) => {
+                    console.log('[LOG] revoke-mint-authority changed:', e.target.checked);
+                    return {
+                      ...f,
+                      revokeMintAuthority: e.target.checked,
+                    };
+                  })
+                }
+                style={{ width: 'auto', cursor: 'pointer' }}
+              />
+              <span>Отозвать права на минт (Revoke Mint Authority)</span>
             </label>
             <label>
               <span>URI метадаты (автоматически)</span>
