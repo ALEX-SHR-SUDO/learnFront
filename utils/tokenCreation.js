@@ -34,6 +34,7 @@ import {
 } from '@solana/spl-token';
 import {
   createCreateMetadataAccountV3Instruction,
+  createSetTokenStandardInstruction,
   PROGRAM_ID as MPL_TOKEN_METADATA_PROGRAM_ID,
   Metadata,
 } from '@metaplex-foundation/mpl-token-metadata';
@@ -156,10 +157,7 @@ export async function createTokenWithMetadata({
   // 5. Create metadata account for FUNGIBLE SPL TOKEN
   // This creates Metaplex metadata with tokenStandard=2 (Fungible), NOT an NFT
   // NFT-specific fields (creators, collection, uses) are set to null for fungible tokens
-  // The Metaplex program will automatically set:
-  //   - tokenStandard: 2 (Fungible) - indicating this is a fungible SPL token
-  //   - editionNonce: 255 (no edition) - fungible tokens don't have editions
-  //   - primarySaleHappened: 0 - not applicable for fungible tokens
+  // We explicitly call SetTokenStandard after metadata account creation to ensure proper identification
   const TOKEN_METADATA_PROGRAM_ID = new PublicKey(MPL_TOKEN_METADATA_PROGRAM_ID);
   const [metadataAccount] = PublicKey.findProgramAddressSync(
     [
@@ -194,6 +192,21 @@ export async function createTokenWithMetadata({
           collectionDetails: null,     // Null for fungible tokens (only used for NFT collection parents)
         },
       }
+    )
+  );
+
+  // 5b. Explicitly set token standard to Fungible (2)
+  // This ensures Solscan and other explorers correctly identify this as a fungible SPL token, not an NFT
+  // The SetTokenStandard instruction infers the token standard from the mint account's decimals
+  // and the absence of a Master Edition account (NFTs have decimals=0 and a Master Edition)
+  transaction.add(
+    createSetTokenStandardInstruction(
+      {
+        metadata: metadataAccount,
+        updateAuthority: wallet.publicKey,
+        mint: mintPublicKey,
+      },
+      TOKEN_METADATA_PROGRAM_ID
     )
   );
 
