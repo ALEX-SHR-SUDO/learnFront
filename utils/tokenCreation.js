@@ -183,12 +183,12 @@ export async function createTokenWithMetadata({
             symbol,
             uri,
             sellerFeeBasisPoints: 0,  // Always 0 for fungible SPL tokens
-            creators: null,            // Null for fungible tokens (only used for NFTs)
-            collection: null,          // Null for fungible tokens (only used for NFT collections)
-            uses: null,                // Null for fungible tokens (only used for NFTs with usage limits)
+            creators: none(),            // Null for fungible tokens (only used for NFTs)
+            collection: none(),          // Null for fungible tokens (only used for NFT collections)
+            uses: none(),                // Null for fungible tokens (only used for NFTs with usage limits)
           },
           isMutable: false,            // Set to false for immutable metadata
-          collectionDetails: null,     // Null for fungible tokens (only used for NFT collection parents)
+          collectionDetails: none(),     // Null for fungible tokens (only used for NFT collection parents)
         },
       }
     )
