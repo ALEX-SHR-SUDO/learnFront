@@ -308,30 +308,6 @@ export default function Home() {
     }
   };
 
-
-
-  // Fetch client wallet balance
-  const fetchClientBalance = async () => {
-    if (connected && publicKey) {
-      try {
-        const endpoint = clusterApiUrl(WalletAdapterNetwork.Devnet);
-        const connection = new Connection(endpoint, 'confirmed');
-        const balance = await connection.getBalance(publicKey);
-        setClientWalletBalance((balance / LAMPORTS_PER_SOL).toFixed(9));
-        
-        // Estimate token creation cost
-        const cost = await estimateTokenCreationCost(connection);
-        setEstimatedCost(cost);
-      } catch (err) {
-        console.error('Error fetching client wallet balance:', err);
-        setClientWalletBalance(null);
-        setEstimatedCost(null);
-      }
-    }
-  };
-
-
-
   // Fetch client wallet balance when connected
   useEffect(() => {
     const fetchClientBalance = async () => {
