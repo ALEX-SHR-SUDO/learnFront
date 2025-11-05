@@ -113,7 +113,10 @@ export default function Home() {
     if (!match) return "image/png"; // Default to PNG
     
     const extension = match[1].toLowerCase();
-    return `image/${extension === 'jpg' ? 'jpeg' : extension}`;
+    // Handle special cases
+    if (extension === 'jpg') return 'image/jpeg';
+    if (extension === 'svg') return 'image/svg+xml';
+    return `image/${extension}`;
   };
 
   // metadata upload
