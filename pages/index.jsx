@@ -1,8 +1,14 @@
 import React, { useRef, useState, useEffect } from "react";
+import { useWallet } from '@solana/wallet-adapter-react';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import { Connection, LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 const BACKEND_URL = "https://learnback-twta.onrender.com";
 
 export default function Home() {
+  // Wallet adapter
+  const { publicKey, connected } = useWallet();
+  
   // refs
   const logoFileInput = useRef(null);
   const logoPreviewRef = useRef(null);
@@ -29,6 +35,9 @@ export default function Home() {
   const [solBalance, setSolBalance] = useState("");
   const [splTokens, setSplTokens] = useState([]);
   const [walletLoading, setWalletLoading] = useState(false);
+  
+  // Client wallet state
+  const [clientWalletBalance, setClientWalletBalance] = useState(null);
 
   // logo upload handler
   const handleLogoUpload = async (file) => {
@@ -253,6 +262,25 @@ export default function Home() {
     fetchWalletBalance();
   }, []);
 
+  // Fetch client wallet balance when connected
+  useEffect(() => {
+    const fetchClientBalance = async () => {
+      if (connected && publicKey) {
+        try {
+          const connection = new Connection('https://api.devnet.solana.com', 'confirmed');
+          const balance = await connection.getBalance(publicKey);
+          setClientWalletBalance((balance / LAMPORTS_PER_SOL).toFixed(9));
+        } catch (err) {
+          console.error('Error fetching client wallet balance:', err);
+          setClientWalletBalance(null);
+        }
+      } else {
+        setClientWalletBalance(null);
+      }
+    };
+    fetchClientBalance();
+  }, [connected, publicKey]);
+
   // drag&drop
   const handleDrop = (e) => {
     e.preventDefault();
@@ -270,6 +298,34 @@ export default function Home() {
 
   return (
     <main>
+      {/* Client Wallet Connection Section */}
+      <div className="client-wallet-section">
+        <h2 style={{ marginTop: 0, marginBottom: 16 }}>Подключение кошелька</h2>
+        <div className="wallet-connection-controls">
+          <WalletMultiButton />
+        </div>
+        {connected && publicKey && (
+          <div className="connected-wallet-info">
+            <div style={{ marginTop: 12, marginBottom: 8 }}>
+              <strong>Подключенный кошелек:</strong>{" "}
+              <a
+                href={`https://solscan.io/account/${publicKey.toString()}?cluster=devnet`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "var(--link-color)", textDecoration: "none" }}
+              >
+                {publicKey.toString().slice(0, 4)}...{publicKey.toString().slice(-4)}
+              </a>
+            </div>
+            {clientWalletBalance !== null && (
+              <div style={{ marginBottom: 8 }}>
+                <strong>Баланс:</strong> {clientWalletBalance} SOL
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+      
       <form id="create-token-form" className="token-form" onSubmit={handleSubmit}>
         <div className="form-row">
           <div

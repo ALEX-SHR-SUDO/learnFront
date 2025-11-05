@@ -218,8 +218,27 @@ main {
   transform: translateY(0);
 }
 
+/* Client wallet connection section */
+.client-wallet-section {
+  max-width: 650px;
+  margin: 0 auto 32px;
+  padding: 18px 32px;
+  background: var(--main-bg);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+.wallet-connection-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.connected-wallet-info {
+  font-size: 15px;
+}
+
 @media (max-width: 700px) {
-  .token-form, .wallet-section {
+  .token-form, .wallet-section, .client-wallet-section {
     padding: 16px 6px;
     max-width: 99vw;
   }

@@ -1,6 +1,7 @@
 import '../styles/globals.css';
 import '../styles/style.css';
 import { useState, useEffect } from 'react';
+import WalletConnectionProvider from '../components/WalletConnectionProvider';
 
 const backgrounds = [
   {
@@ -65,7 +66,7 @@ export default function App({ Component, pageProps }) {
   };
 
   return (
-    <>
+    <WalletConnectionProvider>
       <button 
         className="bg-switcher-btn"
         onClick={switchBackground}
@@ -74,6 +75,6 @@ export default function App({ Component, pageProps }) {
         🎨 Сменить фон
       </button>
       <Component {...pageProps} />
-    </>
+    </WalletConnectionProvider>
   );
 }
