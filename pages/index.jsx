@@ -1,7 +1,8 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import { Connection, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { Connection, LAMPORTS_PER_SOL, clusterApiUrl } from '@solana/web3.js';
+import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 
 const BACKEND_URL = "https://learnback-twta.onrender.com";
 
@@ -267,7 +268,8 @@ export default function Home() {
     const fetchClientBalance = async () => {
       if (connected && publicKey) {
         try {
-          const connection = new Connection('https://api.devnet.solana.com', 'confirmed');
+          const endpoint = clusterApiUrl(WalletAdapterNetwork.Devnet);
+          const connection = new Connection(endpoint, 'confirmed');
           const balance = await connection.getBalance(publicKey);
           setClientWalletBalance((balance / LAMPORTS_PER_SOL).toFixed(9));
         } catch (err) {
