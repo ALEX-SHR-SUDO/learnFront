@@ -111,6 +111,9 @@ main {
 .status-message.error {
   color: var(--error);
 }
+.status-message.warning {
+  color: #ff8c00;
+}
 .fields-block {
   flex: 1 1 0;
   min-width: 0;

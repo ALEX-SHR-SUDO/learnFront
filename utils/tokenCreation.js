@@ -35,6 +35,7 @@ import {
 import {
   createCreateMetadataAccountV3Instruction,
   PROGRAM_ID as MPL_TOKEN_METADATA_PROGRAM_ID,
+  Metadata,
 } from '@metaplex-foundation/mpl-token-metadata';
 
 
@@ -255,5 +256,104 @@ export async function estimateTokenCreationCost(connection) {
   } catch (error) {
     console.error('Error estimating cost:', error);
     return FALLBACK_ESTIMATE_SOL;
+  }
+}
+
+/**
+ * Verify that a token has correct SPL token metadata (not NFT metadata)
+ * 
+ * This function fetches the on-chain metadata and verifies:
+ * - tokenStandard is 2 (Fungible) for SPL tokens
+ * - editionNonce is 255 (no edition) for fungible tokens
+ * - NFT-specific fields (creators, collection) are null
+ * - sellerFeeBasisPoints is 0 for SPL tokens
+ * 
+ * @param {Connection} connection - Solana connection
+ * @param {string} mintAddress - Mint address of the token to verify
+ * @returns {Promise<{isValid: boolean, metadata: Object, errors: string[]}>}
+ */
+export async function verifySPLTokenMetadata(connection, mintAddress) {
+  const errors = [];
+  
+  try {
+    const mintPublicKey = new PublicKey(mintAddress);
+    const TOKEN_METADATA_PROGRAM_ID = new PublicKey(MPL_TOKEN_METADATA_PROGRAM_ID);
+    
+    // Derive metadata account address
+    const [metadataAccount] = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from('metadata'),
+        TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+        mintPublicKey.toBuffer(),
+      ],
+      TOKEN_METADATA_PROGRAM_ID
+    );
+    
+    // Fetch metadata account
+    const accountInfo = await connection.getAccountInfo(metadataAccount);
+    
+    if (!accountInfo) {
+      errors.push('Metadata account not found');
+      return { isValid: false, metadata: null, errors };
+    }
+    
+    // Deserialize metadata
+    const metadata = Metadata.deserialize(accountInfo.data)[0];
+    
+    // Convert to plain object for easier inspection
+    const metadataObj = {
+      key: metadata.key,
+      updateAuthority: metadata.updateAuthority.toString(),
+      mint: metadata.mint.toString(),
+      data: {
+        name: metadata.data.name,
+        symbol: metadata.data.symbol,
+        uri: metadata.data.uri,
+        sellerFeeBasisPoints: metadata.data.sellerFeeBasisPoints,
+      },
+      primarySaleHappened: metadata.primarySaleHappened ? 1 : 0,
+      isMutable: metadata.isMutable ? 1 : 0,
+      editionNonce: metadata.editionNonce,
+      tokenStandard: metadata.tokenStandard,
+      collection: metadata.collection,
+      uses: metadata.uses,
+    };
+    
+    // Verify SPL token characteristics
+    // Token Standard should be 2 (Fungible) for SPL tokens
+    if (metadata.tokenStandard !== 2) {
+      errors.push(`Invalid tokenStandard: expected 2 (Fungible), got ${metadata.tokenStandard}`);
+    }
+    
+    // Edition nonce should be 255 (no edition) for fungible tokens
+    // Note: Metaplex uses 255 as the standard value for fungible tokens (no edition).
+    // Some older tokens may have 251, which is also accepted as indicating no edition.
+    if (metadata.editionNonce !== 255 && metadata.editionNonce !== 251) {
+      errors.push(`Unusual editionNonce: expected 255 or 251, got ${metadata.editionNonce}`);
+    }
+    
+    // Seller fee should be 0 for SPL tokens (not NFTs)
+    if (metadata.data.sellerFeeBasisPoints !== 0) {
+      errors.push(`Invalid sellerFeeBasisPoints: expected 0 for SPL token, got ${metadata.data.sellerFeeBasisPoints}`);
+    }
+    
+    // Collection should be null for SPL tokens (NFT-specific)
+    if (metadata.collection !== null && metadata.collection !== undefined) {
+      errors.push('Collection field should be null for SPL tokens (NFT-specific field)');
+    }
+    
+    // Uses should be null for SPL tokens (NFT-specific)
+    if (metadata.uses !== null && metadata.uses !== undefined) {
+      errors.push('Uses field should be null for SPL tokens (NFT-specific field)');
+    }
+    
+    return {
+      isValid: errors.length === 0,
+      metadata: metadataObj,
+      errors,
+    };
+  } catch (error) {
+    errors.push(`Error verifying metadata: ${error.message}`);
+    return { isValid: false, metadata: null, errors };
   }
 }
