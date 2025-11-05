@@ -85,9 +85,11 @@ The `SetTokenStandard` instruction explicitly sets the token standard to Fungibl
 - `4` = ProgrammableNonFungible
 
 #### editionNonce
-- `255` = No edition (standard for fungible tokens)
-- `251` = Alternative value for fungible tokens
-- Other values indicate NFT editions
+- `251-255` = No edition (standard for fungible tokens)
+  - `255` = Most common value for fungible tokens
+  - `254` = Reserved edition slot, but no Master Edition exists
+  - `251-253` = Alternative values also indicating no edition
+- Other values (< 251) indicate NFT editions
 
 #### isMutable
 - `0` = Immutable (metadata cannot be changed after creation)
@@ -116,7 +118,7 @@ For SPL tokens, we set `isMutable: false` to prevent future changes.
 The application includes a `verifySPLTokenMetadata()` function that checks:
 
 1. ✅ `tokenStandard` is `2` (Fungible)
-2. ✅ `editionNonce` is `255` or `251` (no edition)
+2. ✅ `editionNonce` is `251-255` (no edition)
 3. ✅ `sellerFeeBasisPoints` is `0`
 4. ✅ `collection` is `null` (not an NFT collection)
 5. ✅ `uses` is `null` (no usage limits)

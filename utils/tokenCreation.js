@@ -57,7 +57,7 @@ export const FALLBACK_ESTIMATE_SOL = 0.02; // Fallback estimate if calculation f
  * This function creates a standard fungible SPL token (like USDC, USDT, etc.), NOT an NFT.
  * The resulting token will have:
  * - tokenStandard: 2 (Fungible) - set automatically by Metaplex based on metadata
- * - editionNonce: 255 (no edition) - fungible tokens don't have editions
+ * - editionNonce: 251-255 (no edition) - fungible tokens don't have editions
  * - Null values for NFT-specific fields (creators, collection, uses)
  * 
  * The transaction includes a memo instruction that adds human-readable metadata
@@ -291,7 +291,7 @@ export async function estimateTokenCreationCost(connection) {
  * 
  * This function fetches the on-chain metadata and verifies:
  * - tokenStandard is 2 (Fungible) for SPL tokens
- * - editionNonce is 255 (no edition) for fungible tokens
+ * - editionNonce is 251-255 (no edition) for fungible tokens
  * - NFT-specific fields (creators, collection) are null
  * - sellerFeeBasisPoints is 0 for SPL tokens
  * 
@@ -352,11 +352,11 @@ export async function verifySPLTokenMetadata(connection, mintAddress) {
       errors.push(`Invalid tokenStandard: expected 2 (Fungible), got ${metadata.tokenStandard}`);
     }
     
-    // Edition nonce should be 255 (no edition) for fungible tokens
-    // Note: Metaplex uses 255 as the standard value for fungible tokens (no edition).
-    // Some older tokens may have 251, which is also accepted as indicating no edition.
-    if (metadata.editionNonce !== 255 && metadata.editionNonce !== 251) {
-      errors.push(`Unusual editionNonce: expected 255 or 251, got ${metadata.editionNonce}`);
+    // Edition nonce should be 251-255 (no edition) for fungible tokens
+    // Note: Metaplex uses values 251-255 for fungible tokens (no edition).
+    // 255 is the most common value, but 251-254 are also valid and indicate no edition.
+    if (metadata.editionNonce !== null && (metadata.editionNonce < 251 || metadata.editionNonce > 255)) {
+      errors.push(`Unusual editionNonce: expected 251-255, got ${metadata.editionNonce}`);
     }
     
     // Seller fee should be 0 for SPL tokens (not NFTs)

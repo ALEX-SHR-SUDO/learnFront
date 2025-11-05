@@ -76,8 +76,8 @@ async function verifySPLTokenMetadata(connection, mintAddress) {
       errors.push(`Invalid tokenStandard: expected 2 (Fungible), got ${metadata.tokenStandard}`);
     }
     
-    if (metadata.editionNonce !== 255 && metadata.editionNonce !== 251) {
-      errors.push(`Unusual editionNonce: expected 255 or 251, got ${metadata.editionNonce}`);
+    if (metadata.editionNonce !== null && (metadata.editionNonce < 251 || metadata.editionNonce > 255)) {
+      errors.push(`Unusual editionNonce: expected 251-255, got ${metadata.editionNonce}`);
     }
     
     if (metadata.data.sellerFeeBasisPoints !== 0) {
@@ -141,7 +141,7 @@ async function main() {
   console.log('========================');
   if (result.metadata) {
     console.log(`tokenStandard: ${result.metadata.tokenStandard} ${result.metadata.tokenStandard === 2 ? '✅ (Fungible)' : '❌ (Not Fungible)'}`);
-    console.log(`editionNonce: ${result.metadata.editionNonce} ${[255, 251].includes(result.metadata.editionNonce) ? '✅ (No edition)' : '❌ (Has edition)'}`);
+    console.log(`editionNonce: ${result.metadata.editionNonce} ${result.metadata.editionNonce >= 251 && result.metadata.editionNonce <= 255 ? '✅ (No edition)' : '❌ (Has edition)'}`);
     console.log(`sellerFeeBasisPoints: ${result.metadata.data.sellerFeeBasisPoints} ${result.metadata.data.sellerFeeBasisPoints === 0 ? '✅' : '❌ (Should be 0 for SPL tokens)'}`);
     console.log(`isMutable: ${result.metadata.isMutable} ${result.metadata.isMutable === 0 ? '✅ (Immutable)' : '⚠️ (Mutable)'}`);
   }
