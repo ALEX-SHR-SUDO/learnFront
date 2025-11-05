@@ -35,8 +35,8 @@ import {
 import {
   createCreateMetadataAccountV3Instruction,
   PROGRAM_ID as MPL_TOKEN_METADATA_PROGRAM_ID,
+  Metadata,
 } from '@metaplex-foundation/mpl-token-metadata';
-import { Metadata } from '@metaplex-foundation/mpl-token-metadata';
 
 
 
@@ -326,7 +326,8 @@ export async function verifySPLTokenMetadata(connection, mintAddress) {
     }
     
     // Edition nonce should be 255 (no edition) for fungible tokens
-    // Note: Some versions use 255, others use 251
+    // Note: Metaplex uses 255 as the standard value for fungible tokens (no edition).
+    // Some older tokens may have 251, which is also accepted as indicating no edition.
     if (metadata.editionNonce !== 255 && metadata.editionNonce !== 251) {
       errors.push(`Unusual editionNonce: expected 255 or 251, got ${metadata.editionNonce}`);
     }

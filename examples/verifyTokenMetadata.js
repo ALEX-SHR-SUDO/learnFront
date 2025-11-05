@@ -5,10 +5,10 @@
  * Run this script to verify an existing token's metadata.
  * 
  * Usage:
- *   node examples/verifyTokenMetadata.cjs <MINT_ADDRESS>
+ *   node examples/verifyTokenMetadata.js <MINT_ADDRESS>
  * 
  * Example:
- *   node examples/verifyTokenMetadata.cjs FeR8VBqNRSUD5NtXAj2n3j1dAHkZHfyDktKuLXD4pump
+ *   node examples/verifyTokenMetadata.js FeR8VBqNRSUD5NtXAj2n3j1dAHkZHfyDktKuLXD4pump
  */
 
 const { Connection, clusterApiUrl, PublicKey } = require('@solana/web3.js');
@@ -20,7 +20,7 @@ const mintAddress = process.argv[2];
 
 if (!mintAddress) {
   console.error('Error: Please provide a mint address as an argument');
-  console.log('Usage: node examples/verifyTokenMetadata.cjs <MINT_ADDRESS>');
+  console.log('Usage: node examples/verifyTokenMetadata.js <MINT_ADDRESS>');
   process.exit(1);
 }
 
