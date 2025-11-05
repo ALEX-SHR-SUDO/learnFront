@@ -160,7 +160,7 @@ export async function createTokenWithMetadata({
             collection: null,
             uses: null,
           },
-          isMutable: true,
+          isMutable: false,
           collectionDetails: null,
         },
       }
