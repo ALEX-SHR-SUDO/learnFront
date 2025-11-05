@@ -1,4 +1,6 @@
 // Proxy endpoint for upload-logo to avoid CORS issues
+import { IncomingMessage } from 'http';
+
 export const config = {
   api: {
     bodyParser: false, // Disable body parsing, we need raw body for FormData
@@ -13,14 +15,21 @@ export default async function handler(req, res) {
   const BACKEND_URL = process.env.BACKEND_URL || 'https://learnback-twta.onrender.com';
 
   try {
+    // Collect the request body chunks
+    const chunks = [];
+    for await (const chunk of req) {
+      chunks.push(chunk);
+    }
+    const body = Buffer.concat(chunks);
+
     // Create a new request to the backend, forwarding the body
     const backendResponse = await fetch(`${BACKEND_URL}/api/upload-logo`, {
       method: 'POST',
       headers: {
-        // Forward content-type and other relevant headers
-        ...(req.headers['content-type'] && { 'Content-Type': req.headers['content-type'] }),
+        // Forward content-type which includes boundary for multipart/form-data
+        ...(req.headers['content-type'] && { 'content-type': req.headers['content-type'] }),
       },
-      body: req, // Forward the raw request body (FormData)
+      body: body,
     });
 
     const data = await backendResponse.json();
@@ -32,3 +41,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Failed to upload to backend', details: error.message });
   }
 }
+
