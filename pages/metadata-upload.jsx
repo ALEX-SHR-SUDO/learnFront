@@ -12,6 +12,14 @@ import Link from 'next/link';
 
 const API_BASE = "";
 
+// Helper function to normalize IPFS URLs to Pinata gateway
+const normalizeIpfsUrl = (url) => {
+  return url.replace(
+    /https:\/\/[^\/]+\/ipfs\//,
+    "https://gateway.pinata.cloud/ipfs/"
+  );
+};
+
 export default function MetadataUpload() {
   const { publicKey, connected, signTransaction } = useWallet();
   
@@ -116,10 +124,7 @@ export default function MetadataUpload() {
         return;
       }
       
-      const ipfsUrl = data.ipfsUrl.replace(
-        /https:\/\/[^\/]+\/ipfs\//,
-        "https://gateway.pinata.cloud/ipfs/"
-      );
+      const ipfsUrl = normalizeIpfsUrl(data.ipfsUrl);
       setLogoStatus("Логотип загружен!");
       setLogoStatusClass("status-message success");
       setLogoPreview(ipfsUrl);
@@ -171,10 +176,7 @@ export default function MetadataUpload() {
     const data = await res.json();
 
     if (res.ok && typeof data.ipfsUrl === "string") {
-      const metadataUri = data.ipfsUrl.replace(
-        /https:\/\/[^\/]+\/ipfs\//,
-        "https://gateway.pinata.cloud/ipfs/"
-      );
+      const metadataUri = normalizeIpfsUrl(data.ipfsUrl);
       return metadataUri;
     } else {
       throw new Error(data.error || "Нет ссылки на метадату");
