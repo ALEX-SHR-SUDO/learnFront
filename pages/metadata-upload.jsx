@@ -424,7 +424,7 @@ export default function MetadataUpload() {
             {resultLink && (
               <div>
                 <a 
-                  href={`https://solscan.io/token/${resultLink}?cluster=devnet`}
+                  href={`https://solscan.io/token/${encodeURIComponent(resultLink)}?cluster=devnet`}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ color: 'var(--link-color)', textDecoration: 'none' }}
