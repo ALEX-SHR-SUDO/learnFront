@@ -1,3 +1,17 @@
+/**
+ * Solana Fungible SPL Token Creation Utility
+ * 
+ * This module creates standard fungible SPL tokens (like USDC, SOL-wrapped tokens, etc.)
+ * with Metaplex metadata, NOT NFTs.
+ * 
+ * Key differences between SPL Tokens and NFTs:
+ * - SPL Token: tokenStandard=2 (Fungible), decimals > 0, supply > 1
+ * - NFT: tokenStandard=0 (NonFungible), decimals=0, supply=1, has creators/collection
+ * 
+ * The tokens created by this utility have Metaplex metadata for displaying
+ * name, symbol, and logo in wallets, but are fungible tokens, not NFTs.
+ */
+
 import { 
   Connection, 
   Keypair, 
@@ -31,17 +45,24 @@ const TRANSACTION_FEES_SOL = 0.005; // Approximate transaction fees
 export const FALLBACK_ESTIMATE_SOL = 0.02; // Fallback estimate if calculation fails
 
 /**
- * Create a new token with metadata using the client's wallet
+ * Create a new FUNGIBLE SPL TOKEN with Metaplex metadata using the client's wallet
+ * 
+ * This function creates a standard fungible SPL token (like USDC, USDT, etc.), NOT an NFT.
+ * The resulting token will have:
+ * - tokenStandard: 2 (Fungible) - set automatically by Metaplex based on metadata
+ * - editionNonce: 255 (no edition) - fungible tokens don't have editions
+ * - Null values for NFT-specific fields (creators, collection, uses)
+ * 
  * @param {Object} params - Token creation parameters
  * @param {Connection} params.connection - Solana connection
  * @param {Object} params.wallet - Wallet adapter object with publicKey and signTransaction
  * @param {string} params.name - Token name
  * @param {string} params.symbol - Token symbol
- * @param {string} params.uri - Metadata URI
- * @param {number} params.decimals - Token decimals
+ * @param {string} params.uri - Metadata URI (JSON file with token info)
+ * @param {number} params.decimals - Token decimals (typically 9 for SPL tokens)
  * @param {string|number} params.supply - Initial supply (can be string or number)
- * @param {boolean} params.revokeMintAuthority - Whether to revoke mint authority
- * @param {boolean} params.revokeFreezeAuthority - Whether to revoke freeze authority
+ * @param {boolean} params.revokeMintAuthority - Whether to revoke mint authority (prevents future minting)
+ * @param {boolean} params.revokeFreezeAuthority - Whether to revoke freeze authority (prevents freezing accounts)
  * @returns {Promise<{mintAddress: string, signature: string}>}
  */
 export async function createTokenWithMetadata({
@@ -129,7 +150,13 @@ export async function createTokenWithMetadata({
     )
   );
 
-  // 5. Create metadata account
+  // 5. Create metadata account for FUNGIBLE SPL TOKEN
+  // This creates Metaplex metadata with tokenStandard=2 (Fungible), NOT an NFT
+  // NFT-specific fields (creators, collection, uses) are set to null for fungible tokens
+  // The Metaplex program will automatically set:
+  //   - tokenStandard: 2 (Fungible) - indicating this is a fungible SPL token
+  //   - editionNonce: 255 (no edition) - fungible tokens don't have editions
+  //   - primarySaleHappened: 0 - not applicable for fungible tokens
   const TOKEN_METADATA_PROGRAM_ID = new PublicKey(MPL_TOKEN_METADATA_PROGRAM_ID);
   const [metadataAccount] = PublicKey.findProgramAddressSync(
     [
@@ -155,13 +182,13 @@ export async function createTokenWithMetadata({
             name,
             symbol,
             uri,
-            sellerFeeBasisPoints: 0,
-            creators: null,
-            collection: null,
-            uses: null,
+            sellerFeeBasisPoints: 0,  // Always 0 for fungible SPL tokens
+            creators: null,            // Null for fungible tokens (only used for NFTs)
+            collection: null,          // Null for fungible tokens (only used for NFT collections)
+            uses: null,                // Null for fungible tokens (only used for NFTs with usage limits)
           },
-          isMutable: false,
-          collectionDetails: null,
+          isMutable: false,            // Set to false for immutable metadata
+          collectionDetails: null,     // Null for fungible tokens (only used for NFT collection parents)
         },
       }
     )
