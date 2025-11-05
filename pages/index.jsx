@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { Connection, LAMPORTS_PER_SOL, clusterApiUrl } from '@solana/web3.js';
@@ -34,10 +34,6 @@ export default function Home() {
   const [submitStatus, setSubmitStatus] = useState("");
   const [submitStatusClass, setSubmitStatusClass] = useState("");
   const [resultLink, setResultLink] = useState("");
-  const [walletAddress, setWalletAddress] = useState("");
-  const [solBalance, setSolBalance] = useState("");
-  const [splTokens, setSplTokens] = useState([]);
-  const [walletLoading, setWalletLoading] = useState(false);
   
   // Client wallet state
   const [clientWalletBalance, setClientWalletBalance] = useState(null);
@@ -305,7 +301,7 @@ export default function Home() {
         `<a href="https://solscan.io/token/${result.mintAddress}?cluster=devnet" target="_blank" style="color: var(--link-color); text-decoration: none;">🔍 Посмотреть токен на Solscan</a>`
       );
 
-      // Refresh wallet balance
+      // Refresh wallet balance after token creation
       fetchClientBalance();
     } catch (error) {
       setSubmitStatus(`Ошибка: ${error.message}`);
@@ -314,35 +310,8 @@ export default function Home() {
     }
   };
 
-  // fetch wallet balance
-  const fetchWalletBalance = async () => {
-    setWalletLoading(true);
-    console.log('[LOG] fetchWalletBalance called');
-    try {
-      const res = await fetch(`${API_BASE}/api/wallet-balance`);
-      console.log('[LOG] wallet-balance fetch result:', res);
-      const data = await res.json();
-      console.log('[LOG] wallet-balance response data:', data);
-
-      if (res.ok) {
-        setWalletAddress(data.walletAddress || "");
-        const balanceInSol = parseFloat(data.sol) || 0;
-        setSolBalance(balanceInSol.toFixed(9));
-        const tokens = data.tokens || data.splTokens || [];
-        setSplTokens(tokens);
-        console.log('[LOG] Wallet data set:', data.walletAddress, balanceInSol, tokens);
-      } else {
-        console.error("Ошибка загрузки баланса:", data.error);
-      }
-    } catch (err) {
-      console.error("Ошибка загрузки баланса:", err.message);
-    } finally {
-      setWalletLoading(false);
-    }
-  };
-
   // Fetch client wallet balance
-  const fetchClientBalance = async () => {
+  const fetchClientBalance = useCallback(async () => {
     if (connected && publicKey) {
       try {
         const endpoint = clusterApiUrl(WalletAdapterNetwork.Devnet);
@@ -358,39 +327,16 @@ export default function Home() {
         setClientWalletBalance(null);
         setEstimatedCost(null);
       }
+    } else {
+      setClientWalletBalance(null);
+      setEstimatedCost(null);
     }
-  };
-
-  // load wallet balance on mount
-  useEffect(() => {
-    fetchWalletBalance();
-  }, []);
+  }, [connected, publicKey]);
 
   // Fetch client wallet balance when connected
   useEffect(() => {
-    const fetchClientBalance = async () => {
-      if (connected && publicKey) {
-        try {
-          const endpoint = clusterApiUrl(WalletAdapterNetwork.Devnet);
-          const connection = new Connection(endpoint, 'confirmed');
-          const balance = await connection.getBalance(publicKey);
-          setClientWalletBalance((balance / LAMPORTS_PER_SOL).toFixed(9));
-          
-          // Estimate token creation cost
-          const cost = await estimateTokenCreationCost(connection);
-          setEstimatedCost(cost);
-        } catch (err) {
-          console.error('Error fetching client wallet balance:', err);
-          setClientWalletBalance(null);
-          setEstimatedCost(null);
-        }
-      } else {
-        setClientWalletBalance(null);
-        setEstimatedCost(null);
-      }
-    };
     fetchClientBalance();
-  }, [connected, publicKey]);
+  }, [fetchClientBalance]);
 
   // drag&drop
   const handleDrop = (e) => {
@@ -641,60 +587,6 @@ export default function Home() {
           </div>
         </div>
       </form>
-      <div className="wallet-section">
-        <h3 style={{ marginTop: 0, marginBottom: 12 }}>Сервисный кошелек</h3>
-        {walletLoading ? (
-          <div id="loading-status">Загрузка...</div>
-        ) : (
-          <>
-            <div id="service-wallet-address" style={{ marginBottom: 8 }}>
-              <strong>Адрес:</strong>{" "}
-              {walletAddress ? (
-                <a
-                  href={`https://solscan.io/account/${walletAddress}?cluster=devnet`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ color: "var(--link-color)", textDecoration: "none" }}
-                >
-                  {walletAddress}
-                </a>
-              ) : (
-                "Не загружен"
-              )}
-            </div>
-            <div id="service-balance-display">
-              <strong>Баланс SOL:</strong> {solBalance} SOL
-            </div>
-            {splTokens.length > 0 ? (
-              <>
-                <div style={{ marginTop: 12, marginBottom: 8 }}>
-                  <strong>SPL токены ({splTokens.length}):</strong>
-                </div>
-                <ul id="service-token-list">
-                  {splTokens.map((token, idx) => (
-                    <li key={idx}>
-                      {token.symbol || token.mint}: {token.balance} (Mint: {token.mint?.slice(0, 6) || 'N/A'}...)
-                    </li>
-                  ))}
-                </ul>
-              </>
-            ) : (
-              walletAddress && (
-                <div style={{ marginTop: 12, fontSize: '14px', color: '#888' }}>
-                  SPL токены не найдены
-                </div>
-              )
-            )}
-            <button
-              className="refresh-btn"
-              onClick={fetchWalletBalance}
-              disabled={walletLoading}
-            >
-              🔄 Обновить баланс
-            </button>
-          </>
-        )}
-      </div>
     </main>
   );
 }
