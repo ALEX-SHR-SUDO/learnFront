@@ -24,7 +24,9 @@ import {
 } from '@metaplex-foundation/mpl-token-metadata';
 
 // Cost estimation constants (in SOL)
-const METADATA_ACCOUNT_RENT_SOL = 0.01; // Approximate metadata account rent
+// Note: These are approximate values and may need periodic updates
+// as network conditions and rent requirements change
+const METADATA_ACCOUNT_RENT_SOL = 0.01; // Approximate metadata account rent (~0.0096 SOL as of 2024)
 const TRANSACTION_FEES_SOL = 0.005; // Approximate transaction fees
 export const FALLBACK_ESTIMATE_SOL = 0.02; // Fallback estimate if calculation fails
 
@@ -57,8 +59,12 @@ export async function createTokenWithMetadata({
     throw new Error('Wallet not connected');
   }
 
-  // Convert supply to string if it's a number, then to BigInt
-  const supplyBigInt = BigInt(supply.toString());
+  // Validate and convert supply to BigInt
+  const supplyStr = supply.toString().trim();
+  if (!supplyStr || isNaN(supplyStr) || parseFloat(supplyStr) <= 0) {
+    throw new Error('Supply must be a valid positive number');
+  }
+  const supplyBigInt = BigInt(Math.floor(parseFloat(supplyStr)));
 
   // Generate a new keypair for the mint
   const mintKeypair = Keypair.generate();

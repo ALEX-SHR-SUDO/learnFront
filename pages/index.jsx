@@ -180,10 +180,11 @@ export default function Home() {
       return;
     }
 
-    // Check wallet balance
+    // Check wallet balance (using lamports for precision)
     if (clientWalletBalance !== null) {
-      const balanceInLamports = Math.floor(parseFloat(clientWalletBalance) * LAMPORTS_PER_SOL);
-      const requiredLamports = Math.floor((estimatedCost || FALLBACK_ESTIMATE_SOL) * LAMPORTS_PER_SOL);
+      // Convert to lamports using BigInt for precise comparison
+      const balanceInLamports = BigInt(Math.floor(parseFloat(clientWalletBalance) * LAMPORTS_PER_SOL));
+      const requiredLamports = BigInt(Math.floor((estimatedCost || FALLBACK_ESTIMATE_SOL) * LAMPORTS_PER_SOL));
       if (balanceInLamports < requiredLamports) {
         setSubmitStatus(`Недостаточно SOL в кошельке. Необходимо минимум ${(estimatedCost || FALLBACK_ESTIMATE_SOL).toFixed(4)} SOL.`);
         setSubmitStatusClass("status-message error");
