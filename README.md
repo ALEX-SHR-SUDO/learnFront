@@ -6,6 +6,7 @@ A Next.js application for creating fungible SPL tokens on Solana with proper Met
 
 - 🪙 Create fungible SPL tokens (not NFTs) with proper metadata
 - 📤 Upload token logos and metadata to IPFS via Pinata
+- 📝 **NEW:** Add or update metadata for existing tokens
 - ✅ Automatic verification of SPL token metadata structure
 - 💼 Wallet integration using Solana Wallet Adapter
 - 🔍 View created tokens on Solscan
@@ -55,24 +56,53 @@ npm run build
 .
 ├── components/          # React components
 ├── pages/              # Next.js pages
+│   ├── index.jsx       # Main page for creating new tokens
+│   └── metadata-upload.jsx  # Page for adding/updating metadata
 ├── utils/              # Utility functions
 │   └── tokenCreation.js  # SPL token creation and verification
+├── metadata_upload/    # Metadata upload utilities
+│   ├── updateMetadata.js   # Core metadata update functions
+│   └── README.md          # Metadata upload documentation
 ├── styles/             # CSS styles
 ├── examples/           # Example scripts
-│   └── verifyTokenMetadata.js  # CLI tool to verify token metadata
+│   ├── verifyTokenMetadata.js  # CLI tool to verify token metadata
+│   └── checkTokenMetadata.js   # CLI tool to check existing metadata
 ├── METADATA_STRUCTURE.md  # Detailed metadata documentation
 └── public/             # Static assets
 ```
 
-## Verifying Token Metadata
+## Metadata Upload for Existing Tokens
 
-After creating a token, you can verify its metadata structure using the provided CLI tool:
+The application now supports adding or updating metadata for tokens that were already created. This is useful for:
+- Tokens created without metadata
+- Tokens that need updated information (name, symbol, logo)
+
+### Using the Metadata Upload Feature
+
+1. Navigate to `/metadata-upload` page in the application
+2. Connect your wallet (must be the mint/update authority)
+3. Enter the mint address of your existing token
+4. Click "Check" to verify the token and see existing metadata
+5. Upload a new logo and update token information
+6. Click "Create/Update Metadata" to apply changes
+
+### CLI Tools
+
+Check metadata for an existing token:
+
+```bash
+node examples/checkTokenMetadata.js <MINT_ADDRESS>
+```
+
+Verify SPL token metadata structure:
 
 ```bash
 node examples/verifyTokenMetadata.js <MINT_ADDRESS>
 ```
 
-This will check that the token has correct SPL token metadata and is not configured as an NFT.
+These tools will check that the token has correct SPL token metadata and is not configured as an NFT.
+
+For detailed information about the metadata upload feature, see [metadata_upload/README.md](./metadata_upload/README.md).
 
 ## Key Functions
 

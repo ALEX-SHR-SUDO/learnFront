@@ -4,6 +4,7 @@ import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { Connection, LAMPORTS_PER_SOL, clusterApiUrl } from '@solana/web3.js';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import { createTokenWithMetadata, estimateTokenCreationCost, verifySPLTokenMetadata, FALLBACK_ESTIMATE_SOL } from '../utils/tokenCreation';
+import Link from 'next/link';
 
 // Use local API routes which proxy to the backend to avoid CORS issues
 const API_BASE = "";
@@ -355,6 +356,13 @@ export default function Home() {
 
   return (
     <main>
+      <div style={{ marginBottom: 24, padding: '12px', background: '#e3f2fd', borderRadius: '8px', fontSize: '14px' }}>
+        ℹ️ Нужно обновить метадату существующего токена?{' '}
+        <Link href="/metadata-upload" style={{ color: 'var(--link-color)', textDecoration: 'none', fontWeight: 'bold' }}>
+          Перейти к загрузке метадаты →
+        </Link>
+      </div>
+      
       {/* Client Wallet Connection Section */}
       <div className="client-wallet-section">
         <h2 style={{ marginTop: 0, marginBottom: 16 }}>Подключение кошелька</h2>
