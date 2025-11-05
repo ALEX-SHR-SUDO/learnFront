@@ -157,7 +157,7 @@ export async function createTokenWithMetadata({
   // 5. Create metadata account for FUNGIBLE SPL TOKEN
   // This creates Metaplex metadata with tokenStandard=2 (Fungible), NOT an NFT
   // NFT-specific fields (creators, collection, uses) are set to null for fungible tokens
-  // We explicitly call SetTokenStandard after creation to ensure proper identification
+  // We explicitly call SetTokenStandard after metadata account creation to ensure proper identification
   const TOKEN_METADATA_PROGRAM_ID = new PublicKey(MPL_TOKEN_METADATA_PROGRAM_ID);
   const [metadataAccount] = PublicKey.findProgramAddressSync(
     [
