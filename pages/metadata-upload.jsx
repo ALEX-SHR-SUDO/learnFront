@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import { Connection, clusterApiUrl, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { Connection, clusterApiUrl } from '@solana/web3.js';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import { 
   checkMetadataExists, 
@@ -264,9 +264,7 @@ export default function MetadataUpload() {
       }
       
       setSubmitStatusClass("status-message success");
-      setResultLink(
-        `<a href="https://solscan.io/token/${mintAddress}?cluster=devnet" target="_blank" style="color: var(--link-color); text-decoration: none;">🔍 Посмотреть токен на Solscan</a>`
-      );
+      setResultLink(mintAddress);
     } catch (error) {
       setSubmitStatus(`Ошибка: ${error.message}`);
       setSubmitStatusClass("status-message error");
@@ -421,9 +419,18 @@ export default function MetadataUpload() {
             >
               {submitStatus}
             </div>
-            <div
-              dangerouslySetInnerHTML={{ __html: resultLink }}
-            ></div>
+            {resultLink && (
+              <div>
+                <a 
+                  href={`https://solscan.io/token/${resultLink}?cluster=devnet`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: 'var(--link-color)', textDecoration: 'none' }}
+                >
+                  🔍 Посмотреть токен на Solscan
+                </a>
+              </div>
+            )}
           </div>
         </div>
       </form>
