@@ -20,7 +20,7 @@ import {
 } from '@solana/spl-token';
 import {
   createCreateMetadataAccountV3Instruction,
-  MPL_TOKEN_METADATA_PROGRAM_ID,
+  PROGRAM_ID as MPL_TOKEN_METADATA_PROGRAM_ID,
 } from '@metaplex-foundation/mpl-token-metadata';
 
 // Cost estimation constants (in SOL)
