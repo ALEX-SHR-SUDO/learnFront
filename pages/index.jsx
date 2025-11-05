@@ -107,16 +107,48 @@ export default function Home() {
     }
   };
 
+  /**
+   * Determine image MIME type from URL file extension
+   * @param {string} url - The URL of the image file
+   * @returns {string} MIME type string (e.g., 'image/png', 'image/jpeg', 'image/svg+xml')
+   * 
+   * Supported file types: PNG, JPEG/JPG, GIF, SVG, WebP
+   * Defaults to 'image/png' if no recognized extension is found
+   */
+  const getImageMimeType = (url) => {
+    const match = url.match(/\.(jpg|jpeg|png|gif|svg|webp)$/i);
+    if (!match) return "image/png"; // Default to PNG
+    
+    const extension = match[1].toLowerCase();
+    // Handle special cases
+    if (extension === 'jpg') return 'image/jpeg';
+    if (extension === 'svg') return 'image/svg+xml';
+    return `image/${extension}`;
+  };
+
   // metadata upload
   const uploadMetadataToPinata = async (ipfsLogoUrl) => {
     console.log('[LOG] uploadMetadataToPinata called. ipfsLogoUrl:', ipfsLogoUrl);
 
+    // Determine image type from URL or default to png
+    const imageType = getImageMimeType(ipfsLogoUrl);
+
+    // Create metadata following Metaplex Token Metadata standard
+    // Including properties.files array is crucial for proper display on Solscan and wallets
     const metadata = {
       name: form.name || "Token",
       symbol: form.symbol || "TKN",
-      image: ipfsLogoUrl,
       description: form.description || "",
-      attributes: [],
+      image: ipfsLogoUrl,
+      properties: {
+        files: [
+          {
+            uri: ipfsLogoUrl,
+            type: imageType,
+          }
+        ],
+        category: "image",
+      }
     };
     const jsonBlob = new Blob([JSON.stringify(metadata)], { type: "application/json" });
     const formData = new FormData();
