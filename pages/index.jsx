@@ -3,7 +3,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { Connection, LAMPORTS_PER_SOL, clusterApiUrl } from '@solana/web3.js';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
-import { createTokenWithMetadata, estimateTokenCreationCost, FALLBACK_ESTIMATE_SOL } from '../utils/tokenCreation';
+import { createTokenWithMetadata, estimateTokenCreationCost, verifySPLTokenMetadata, FALLBACK_ESTIMATE_SOL } from '../utils/tokenCreation';
 
 const BACKEND_URL = "https://learnback-twta.onrender.com";
 
@@ -269,12 +269,40 @@ export default function Home() {
         revokeFreezeAuthority: form.revokeFreezeAuthority,
       });
 
-      setSubmitStatus(`Токен создан! Mint: ${result.mintAddress.slice(0, 6)}...`);
-      setSubmitStatusClass("status-message success");
+      console.log('[LOG] Token created! Mint:', result.mintAddress);
+      
+      // Verify SPL token metadata
+      setSubmitStatus("Токен создан! Проверка метаданных...");
+      setSubmitStatusClass("status-message loading");
+      
+      // Wait a bit for metadata to be indexed
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      const verification = await verifySPLTokenMetadata(connection, result.mintAddress);
+      
+      console.log('[LOG] Metadata verification result:', verification);
+      
+      if (verification.isValid) {
+        setSubmitStatus(
+          `✅ Токен создан и проверен!\n` +
+          `Mint: ${result.mintAddress.slice(0, 6)}...${result.mintAddress.slice(-4)}\n` +
+          `TokenStandard: ${verification.metadata.tokenStandard} (Fungible)\n` +
+          `EditionNonce: ${verification.metadata.editionNonce}\n` +
+          `Metadata корректна для SPL токена!`
+        );
+        setSubmitStatusClass("status-message success");
+      } else {
+        setSubmitStatus(
+          `⚠️ Токен создан, но обнаружены проблемы:\n` +
+          `Mint: ${result.mintAddress.slice(0, 6)}...${result.mintAddress.slice(-4)}\n` +
+          verification.errors.join('\n')
+        );
+        setSubmitStatusClass("status-message warning");
+      }
+      
       setResultLink(
         `<a href="https://solscan.io/token/${result.mintAddress}?cluster=devnet" target="_blank" style="color: var(--link-color); text-decoration: none;">🔍 Посмотреть токен на Solscan</a>`
       );
-      console.log('[LOG] Token created! Mint:', result.mintAddress);
 
       // Refresh wallet balance
       fetchClientBalance();
