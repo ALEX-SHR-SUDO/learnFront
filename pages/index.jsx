@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { Connection, LAMPORTS_PER_SOL, clusterApiUrl } from '@solana/web3.js';
@@ -301,6 +301,8 @@ export default function Home() {
         `<a href="https://solscan.io/token/${result.mintAddress}?cluster=devnet" target="_blank" style="color: var(--link-color); text-decoration: none;">🔍 Посмотреть токен на Solscan</a>`
       );
 
+      // Refresh wallet balance after token creation
+      fetchClientBalance();
     } catch (error) {
       setSubmitStatus(`Ошибка: ${error.message}`);
       setSubmitStatusClass("status-message error");
@@ -308,31 +310,33 @@ export default function Home() {
     }
   };
 
-  // Fetch client wallet balance when connected
-  useEffect(() => {
-    const fetchClientBalance = async () => {
-      if (connected && publicKey) {
-        try {
-          const endpoint = clusterApiUrl(WalletAdapterNetwork.Devnet);
-          const connection = new Connection(endpoint, 'confirmed');
-          const balance = await connection.getBalance(publicKey);
-          setClientWalletBalance((balance / LAMPORTS_PER_SOL).toFixed(9));
-          
-          // Estimate token creation cost
-          const cost = await estimateTokenCreationCost(connection);
-          setEstimatedCost(cost);
-        } catch (err) {
-          console.error('Error fetching client wallet balance:', err);
-          setClientWalletBalance(null);
-          setEstimatedCost(null);
-        }
-      } else {
+  // Fetch client wallet balance
+  const fetchClientBalance = useCallback(async () => {
+    if (connected && publicKey) {
+      try {
+        const endpoint = clusterApiUrl(WalletAdapterNetwork.Devnet);
+        const connection = new Connection(endpoint, 'confirmed');
+        const balance = await connection.getBalance(publicKey);
+        setClientWalletBalance((balance / LAMPORTS_PER_SOL).toFixed(9));
+        
+        // Estimate token creation cost
+        const cost = await estimateTokenCreationCost(connection);
+        setEstimatedCost(cost);
+      } catch (err) {
+        console.error('Error fetching client wallet balance:', err);
         setClientWalletBalance(null);
         setEstimatedCost(null);
       }
-    };
-    fetchClientBalance();
+    } else {
+      setClientWalletBalance(null);
+      setEstimatedCost(null);
+    }
   }, [connected, publicKey]);
+
+  // Fetch client wallet balance when connected
+  useEffect(() => {
+    fetchClientBalance();
+  }, [fetchClientBalance]);
 
   // drag&drop
   const handleDrop = (e) => {
