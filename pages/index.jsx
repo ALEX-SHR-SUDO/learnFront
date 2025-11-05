@@ -111,12 +111,27 @@ export default function Home() {
   const uploadMetadataToPinata = async (ipfsLogoUrl) => {
     console.log('[LOG] uploadMetadataToPinata called. ipfsLogoUrl:', ipfsLogoUrl);
 
+    // Determine image type from URL or default to png
+    const imageType = ipfsLogoUrl.match(/\.(jpg|jpeg|png|gif|svg|webp)$/i)?.[0] 
+      ? `image/${ipfsLogoUrl.match(/\.(jpg|jpeg|png|gif|svg|webp)$/i)[1].toLowerCase().replace('jpg', 'jpeg')}`
+      : "image/png";
+
+    // Create metadata following Metaplex Token Metadata standard
+    // Including properties.files array is crucial for proper display on Solscan and wallets
     const metadata = {
       name: form.name || "Token",
       symbol: form.symbol || "TKN",
-      image: ipfsLogoUrl,
       description: form.description || "",
-      attributes: [],
+      image: ipfsLogoUrl,
+      properties: {
+        files: [
+          {
+            uri: ipfsLogoUrl,
+            type: imageType,
+          }
+        ],
+        category: "image",
+      }
     };
     const jsonBlob = new Blob([JSON.stringify(metadata)], { type: "application/json" });
     const formData = new FormData();
