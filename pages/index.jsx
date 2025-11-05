@@ -227,7 +227,7 @@ export default function Home() {
         symbol: form.symbol,
         uri: metadataUri,
         decimals: form.decimals,
-        supply: parseInt(form.supply),
+        supply: parseInt(form.supply, 10),
         revokeMintAuthority: form.revokeMintAuthority,
         revokeFreezeAuthority: form.revokeFreezeAuthority,
       });

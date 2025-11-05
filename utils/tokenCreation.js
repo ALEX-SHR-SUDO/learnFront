@@ -103,7 +103,7 @@ export async function createTokenWithMetadata({
   );
 
   // 4. Mint tokens to the associated token account
-  const amount = supply * Math.pow(10, decimals);
+  const amount = BigInt(supply) * BigInt(Math.pow(10, decimals));
   transaction.add(
     createMintToInstruction(
       mintPublicKey,
@@ -202,12 +202,13 @@ export async function createTokenWithMetadata({
  * @returns {Promise<number>} Estimated cost in SOL
  */
 export async function estimateTokenCreationCost(connection) {
+  // Constants for estimation
+  const METADATA_ACCOUNT_RENT = 0.01 * LAMPORTS_PER_SOL; // Approximate metadata account rent
+  const TRANSACTION_FEES = 0.005 * LAMPORTS_PER_SOL; // Approximate transaction fees
+  
   try {
     const mintRent = await getMinimumBalanceForRentExemptMint(connection);
-    // Additional rent for metadata account (~0.01 SOL) + transaction fees (~0.001 SOL)
-    const metadataRent = 0.01 * LAMPORTS_PER_SOL;
-    const transactionFees = 0.005 * LAMPORTS_PER_SOL;
-    const totalLamports = mintRent + metadataRent + transactionFees;
+    const totalLamports = mintRent + METADATA_ACCOUNT_RENT + TRANSACTION_FEES;
     return totalLamports / LAMPORTS_PER_SOL;
   } catch (error) {
     console.error('Error estimating cost:', error);
