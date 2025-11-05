@@ -5,7 +5,8 @@ import { Connection, LAMPORTS_PER_SOL, clusterApiUrl } from '@solana/web3.js';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import { createTokenWithMetadata, estimateTokenCreationCost, verifySPLTokenMetadata, FALLBACK_ESTIMATE_SOL } from '../utils/tokenCreation';
 
-const BACKEND_URL = "https://learnback-twta.onrender.com";
+// Use local API routes which proxy to the backend to avoid CORS issues
+const API_BASE = "";
 
 export default function Home() {
   // Wallet adapter
@@ -74,7 +75,7 @@ export default function Home() {
     formData.append("file", file);
 
     try {
-      const res = await fetch(`${BACKEND_URL}/api/upload-logo`, {
+      const res = await fetch(`${API_BASE}/api/upload-logo`, {
         method: "POST",
         body: formData,
       });
@@ -154,7 +155,7 @@ export default function Home() {
     const formData = new FormData();
     formData.append("file", jsonBlob, "metadata.json");
     
-    const res = await fetch(`${BACKEND_URL}/api/upload-logo`, {
+    const res = await fetch(`${API_BASE}/api/upload-logo`, {
       method: "POST",
       body: formData,
     });
@@ -318,7 +319,7 @@ export default function Home() {
     setWalletLoading(true);
     console.log('[LOG] fetchWalletBalance called');
     try {
-      const res = await fetch(`${BACKEND_URL}/api/wallet-balance`);
+      const res = await fetch(`${API_BASE}/api/wallet-balance`);
       console.log('[LOG] wallet-balance fetch result:', res);
       const data = await res.json();
       console.log('[LOG] wallet-balance response data:', data);
