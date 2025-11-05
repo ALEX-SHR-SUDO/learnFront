@@ -38,6 +38,9 @@ import {
   PROGRAM_ID as MPL_TOKEN_METADATA_PROGRAM_ID,
   Metadata,
 } from '@metaplex-foundation/mpl-token-metadata';
+import {
+  createMemoInstruction,
+} from '@solana/spl-memo';
 
 
 
@@ -56,6 +59,10 @@ export const FALLBACK_ESTIMATE_SOL = 0.02; // Fallback estimate if calculation f
  * - tokenStandard: 2 (Fungible) - set automatically by Metaplex based on metadata
  * - editionNonce: 255 (no edition) - fungible tokens don't have editions
  * - Null values for NFT-specific fields (creators, collection, uses)
+ * 
+ * The transaction includes a memo instruction that adds human-readable metadata
+ * describing the token creation operation. This memo will be visible on block
+ * explorers like Solscan.
  * 
  * @param {Object} params - Token creation parameters
  * @param {Connection} params.connection - Solana connection
@@ -106,6 +113,13 @@ export async function createTokenWithMetadata({
 
   // Create transaction
   const transaction = new Transaction();
+
+  // Add memo instruction to describe the transaction
+  // This metadata will be visible on block explorers like Solscan
+  const memoText = `Creating SPL Token: ${name} (${symbol}) - Supply: ${supplyBigInt}, Decimals: ${decimals}`;
+  transaction.add(
+    createMemoInstruction(memoText, [wallet.publicKey])
+  );
 
   // 1. Create mint account
   transaction.add(

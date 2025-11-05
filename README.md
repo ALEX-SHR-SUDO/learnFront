@@ -9,6 +9,7 @@ A Next.js application for creating fungible SPL tokens on Solana with proper Met
 - ✅ Automatic verification of SPL token metadata structure
 - 💼 Wallet integration using Solana Wallet Adapter
 - 🔍 View created tokens on Solscan
+- 📝 Transaction metadata (memo) for improved traceability on block explorers
 
 ## What Makes This an SPL Token (Not an NFT)?
 
@@ -78,6 +79,10 @@ This will check that the token has correct SPL token metadata and is not configu
 ### `createTokenWithMetadata()`
 
 Creates a new fungible SPL token with Metaplex metadata.
+
+The function automatically includes a memo instruction in the transaction that describes
+the token being created. This memo is visible on block explorers like Solscan and helps
+identify the purpose of the transaction.
 
 ```javascript
 const result = await createTokenWithMetadata({
