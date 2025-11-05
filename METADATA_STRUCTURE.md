@@ -49,7 +49,9 @@ The JSON metadata file uploaded to Pinata follows the Metaplex Token Metadata st
 
 ## On-Chain Metadata (Solana Account)
 
-The on-chain metadata is created using `createCreateMetadataAccountV3Instruction` from `@metaplex-foundation/mpl-token-metadata`.
+The on-chain metadata is created using `createCreateMetadataAccountV3Instruction` followed by `createSetTokenStandardInstruction` from `@metaplex-foundation/mpl-token-metadata`.
+
+The `SetTokenStandard` instruction explicitly sets the token standard to Fungible (2), ensuring that blockchain explorers like Solscan correctly identify the token as a fungible SPL token rather than an NFT.
 
 ### Structure of On-Chain Metadata Account
 
