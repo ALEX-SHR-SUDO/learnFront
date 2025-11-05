@@ -107,14 +107,21 @@ export default function Home() {
     }
   };
 
+  // Helper function to determine image MIME type from URL
+  const getImageMimeType = (url) => {
+    const match = url.match(/\.(jpg|jpeg|png|gif|svg|webp)$/i);
+    if (!match) return "image/png"; // Default to PNG
+    
+    const extension = match[1].toLowerCase();
+    return `image/${extension === 'jpg' ? 'jpeg' : extension}`;
+  };
+
   // metadata upload
   const uploadMetadataToPinata = async (ipfsLogoUrl) => {
     console.log('[LOG] uploadMetadataToPinata called. ipfsLogoUrl:', ipfsLogoUrl);
 
     // Determine image type from URL or default to png
-    const imageType = ipfsLogoUrl.match(/\.(jpg|jpeg|png|gif|svg|webp)$/i)?.[0] 
-      ? `image/${ipfsLogoUrl.match(/\.(jpg|jpeg|png|gif|svg|webp)$/i)[1].toLowerCase().replace('jpg', 'jpeg')}`
-      : "image/png";
+    const imageType = getImageMimeType(ipfsLogoUrl);
 
     // Create metadata following Metaplex Token Metadata standard
     // Including properties.files array is crucial for proper display on Solscan and wallets
