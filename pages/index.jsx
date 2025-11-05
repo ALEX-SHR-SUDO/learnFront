@@ -3,12 +3,13 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { Connection, LAMPORTS_PER_SOL, clusterApiUrl } from '@solana/web3.js';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
+import { createTokenWithMetadata, estimateTokenCreationCost } from '../utils/tokenCreation';
 
 const BACKEND_URL = "https://learnback-twta.onrender.com";
 
 export default function Home() {
   // Wallet adapter
-  const { publicKey, connected } = useWallet();
+  const { publicKey, connected, signTransaction } = useWallet();
   
   // refs
   const logoFileInput = useRef(null);
@@ -39,6 +40,7 @@ export default function Home() {
   
   // Client wallet state
   const [clientWalletBalance, setClientWalletBalance] = useState(null);
+  const [estimatedCost, setEstimatedCost] = useState(null);
 
   // logo upload handler
   const handleLogoUpload = async (file) => {
@@ -151,6 +153,14 @@ export default function Home() {
     setResultLink("");
     console.log('[LOG] handleSubmit called. form:', form, 'logoIpfsUrl:', logoIpfsUrl);
 
+    // Check if wallet is connected
+    if (!connected || !publicKey) {
+      setSubmitStatus("Подключите кошелек для создания токена.");
+      setSubmitStatusClass("status-message error");
+      console.log('[ERROR] Submit: Wallet not connected');
+      return;
+    }
+
     if (!form.name || !form.symbol) {
       setSubmitStatus("Заполните все поля метаданных (Имя, Символ).");
       setSubmitStatusClass("status-message error");
@@ -167,6 +177,14 @@ export default function Home() {
       setSubmitStatus("Сначала загрузите логотип.");
       setSubmitStatusClass("status-message error");
       console.log('[ERROR] Submit: Logo not uploaded');
+      return;
+    }
+
+    // Check wallet balance
+    if (clientWalletBalance !== null && parseFloat(clientWalletBalance) < (estimatedCost || 0.02)) {
+      setSubmitStatus(`Недостаточно SOL в кошельке. Необходимо минимум ${(estimatedCost || 0.02).toFixed(4)} SOL.`);
+      setSubmitStatusClass("status-message error");
+      console.log('[ERROR] Submit: Insufficient balance');
       return;
     }
 
@@ -192,38 +210,37 @@ export default function Home() {
       return;
     }
 
-    setSubmitStatus("Создание и минт токена, подождите...");
+    setSubmitStatus("Создание и минт токена из вашего кошелька, подпишите транзакцию...");
     setSubmitStatusClass("status-message loading");
     console.log('[LOG] Creating token with URI:', metadataUri);
 
     try {
-      const res = await fetch(`${BACKEND_URL}/api/create-token`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: form.name,
-          symbol: form.symbol,
-          supply: form.supply,
-          decimals: form.decimals,
-          uri: metadataUri,
-          revokeFreezeAuthority: form.revokeFreezeAuthority,
-          revokeMintAuthority: form.revokeMintAuthority,
-        }),
-      });
-      console.log('[LOG] create-token fetch result:', res);
-      const data = await res.json();
-      console.log('[LOG] create-token response data:', data);
+      // Create connection to Solana
+      const endpoint = clusterApiUrl(WalletAdapterNetwork.Devnet);
+      const connection = new Connection(endpoint, 'confirmed');
 
-      if (res.ok) {
-        setSubmitStatus(`Токен создан! Mint: ${data.mintAddress.slice(0, 6)}...`);
-        setSubmitStatusClass("status-message success");
-        setResultLink(
-          `<a href="https://solscan.io/token/${data.mintAddress}?cluster=devnet" target="_blank" style="color: var(--link-color); text-decoration: none;">🔍 Посмотреть токен на Solscan</a>`
-        );
-        console.log('[LOG] Token created! Mint:', data.mintAddress);
-      } else {
-        throw new Error(data.error || "Неизвестная ошибка сервера.");
-      }
+      // Create token using client wallet
+      const result = await createTokenWithMetadata({
+        connection,
+        wallet: { publicKey, signTransaction },
+        name: form.name,
+        symbol: form.symbol,
+        uri: metadataUri,
+        decimals: form.decimals,
+        supply: parseInt(form.supply),
+        revokeMintAuthority: form.revokeMintAuthority,
+        revokeFreezeAuthority: form.revokeFreezeAuthority,
+      });
+
+      setSubmitStatus(`Токен создан! Mint: ${result.mintAddress.slice(0, 6)}...`);
+      setSubmitStatusClass("status-message success");
+      setResultLink(
+        `<a href="https://solscan.io/token/${result.mintAddress}?cluster=devnet" target="_blank" style="color: var(--link-color); text-decoration: none;">🔍 Посмотреть токен на Solscan</a>`
+      );
+      console.log('[LOG] Token created! Mint:', result.mintAddress);
+
+      // Refresh wallet balance
+      fetchClientBalance();
     } catch (error) {
       setSubmitStatus(`Ошибка: ${error.message}`);
       setSubmitStatusClass("status-message error");
@@ -258,6 +275,26 @@ export default function Home() {
     }
   };
 
+  // Fetch client wallet balance
+  const fetchClientBalance = async () => {
+    if (connected && publicKey) {
+      try {
+        const endpoint = clusterApiUrl(WalletAdapterNetwork.Devnet);
+        const connection = new Connection(endpoint, 'confirmed');
+        const balance = await connection.getBalance(publicKey);
+        setClientWalletBalance((balance / LAMPORTS_PER_SOL).toFixed(9));
+        
+        // Estimate token creation cost
+        const cost = await estimateTokenCreationCost(connection);
+        setEstimatedCost(cost);
+      } catch (err) {
+        console.error('Error fetching client wallet balance:', err);
+        setClientWalletBalance(null);
+        setEstimatedCost(null);
+      }
+    }
+  };
+
   // load wallet balance on mount
   useEffect(() => {
     fetchWalletBalance();
@@ -272,12 +309,18 @@ export default function Home() {
           const connection = new Connection(endpoint, 'confirmed');
           const balance = await connection.getBalance(publicKey);
           setClientWalletBalance((balance / LAMPORTS_PER_SOL).toFixed(9));
+          
+          // Estimate token creation cost
+          const cost = await estimateTokenCreationCost(connection);
+          setEstimatedCost(cost);
         } catch (err) {
           console.error('Error fetching client wallet balance:', err);
           setClientWalletBalance(null);
+          setEstimatedCost(null);
         }
       } else {
         setClientWalletBalance(null);
+        setEstimatedCost(null);
       }
     };
     fetchClientBalance();
@@ -324,6 +367,16 @@ export default function Home() {
                 <strong>Баланс:</strong> {clientWalletBalance} SOL
               </div>
             )}
+            {estimatedCost !== null && (
+              <div style={{ marginBottom: 8, fontSize: '14px', color: '#666' }}>
+                Примерная стоимость создания токена: ~{estimatedCost.toFixed(4)} SOL
+              </div>
+            )}
+          </div>
+        )}
+        {!connected && (
+          <div style={{ marginTop: 12, padding: '12px', background: '#fff3cd', borderRadius: '8px', fontSize: '14px' }}>
+            ⚠️ Подключите кошелек для создания токена. Токены создаются напрямую из вашего кошелька.
           </div>
         )}
       </div>
@@ -505,8 +558,8 @@ export default function Home() {
                 value={tokenUri}
               />
             </label>
-            <button type="submit" id="create-token-btn" className="main-btn">
-              Создать токен
+            <button type="submit" id="create-token-btn" className="main-btn" disabled={!connected}>
+              {connected ? 'Создать токен' : 'Подключите кошелек'}
             </button>
             <div
               id="create-status-message"
