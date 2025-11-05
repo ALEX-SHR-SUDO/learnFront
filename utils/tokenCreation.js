@@ -32,7 +32,7 @@ import {
  * @param {string} params.symbol - Token symbol
  * @param {string} params.uri - Metadata URI
  * @param {number} params.decimals - Token decimals
- * @param {number} params.supply - Initial supply
+ * @param {string|number} params.supply - Initial supply (can be string or number)
  * @param {boolean} params.revokeMintAuthority - Whether to revoke mint authority
  * @param {boolean} params.revokeFreezeAuthority - Whether to revoke freeze authority
  * @returns {Promise<{mintAddress: string, signature: string}>}
@@ -51,6 +51,9 @@ export async function createTokenWithMetadata({
   if (!wallet.publicKey || !wallet.signTransaction) {
     throw new Error('Wallet not connected');
   }
+
+  // Convert supply to string if it's a number, then to BigInt
+  const supplyBigInt = BigInt(supply.toString());
 
   // Generate a new keypair for the mint
   const mintKeypair = Keypair.generate();
@@ -103,7 +106,7 @@ export async function createTokenWithMetadata({
   );
 
   // 4. Mint tokens to the associated token account
-  const amount = BigInt(supply) * BigInt(Math.pow(10, decimals));
+  const amount = supplyBigInt * (BigInt(10) ** BigInt(decimals));
   transaction.add(
     createMintToInstruction(
       mintPublicKey,

@@ -181,11 +181,15 @@ export default function Home() {
     }
 
     // Check wallet balance
-    if (clientWalletBalance !== null && parseFloat(clientWalletBalance) < (estimatedCost || 0.02)) {
-      setSubmitStatus(`Недостаточно SOL в кошельке. Необходимо минимум ${(estimatedCost || 0.02).toFixed(4)} SOL.`);
-      setSubmitStatusClass("status-message error");
-      console.log('[ERROR] Submit: Insufficient balance');
-      return;
+    if (clientWalletBalance !== null) {
+      const balanceInLamports = Math.floor(parseFloat(clientWalletBalance) * LAMPORTS_PER_SOL);
+      const requiredLamports = Math.floor((estimatedCost || 0.02) * LAMPORTS_PER_SOL);
+      if (balanceInLamports < requiredLamports) {
+        setSubmitStatus(`Недостаточно SOL в кошельке. Необходимо минимум ${(estimatedCost || 0.02).toFixed(4)} SOL.`);
+        setSubmitStatusClass("status-message error");
+        console.log('[ERROR] Submit: Insufficient balance');
+        return;
+      }
     }
 
     setSubmitStatus("Загрузка метадаты...");
@@ -227,7 +231,7 @@ export default function Home() {
         symbol: form.symbol,
         uri: metadataUri,
         decimals: form.decimals,
-        supply: parseInt(form.supply, 10),
+        supply: form.supply, // Pass as string, utility will handle BigInt conversion
         revokeMintAuthority: form.revokeMintAuthority,
         revokeFreezeAuthority: form.revokeFreezeAuthority,
       });
