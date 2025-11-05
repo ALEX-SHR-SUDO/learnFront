@@ -20,7 +20,7 @@ import {
 } from '@solana/spl-token';
 import {
   createCreateMetadataAccountV3Instruction,
-  PROGRAM_ID as TOKEN_METADATA_PROGRAM_ID,
+  MPL_TOKEN_METADATA_PROGRAM_ID,
 } from '@metaplex-foundation/mpl-token-metadata';
 
 // Cost estimation constants (in SOL)
@@ -130,6 +130,7 @@ export async function createTokenWithMetadata({
   );
 
   // 5. Create metadata account
+  const TOKEN_METADATA_PROGRAM_ID = new PublicKey(MPL_TOKEN_METADATA_PROGRAM_ID);
   const [metadataAccount] = PublicKey.findProgramAddressSync(
     [
       Buffer.from('metadata'),
