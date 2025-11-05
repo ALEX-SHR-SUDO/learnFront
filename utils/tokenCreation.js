@@ -23,6 +23,11 @@ import {
   PROGRAM_ID as TOKEN_METADATA_PROGRAM_ID,
 } from '@metaplex-foundation/mpl-token-metadata';
 
+// Cost estimation constants (in SOL)
+const METADATA_ACCOUNT_RENT_SOL = 0.01; // Approximate metadata account rent
+const TRANSACTION_FEES_SOL = 0.005; // Approximate transaction fees
+export const FALLBACK_ESTIMATE_SOL = 0.02; // Fallback estimate if calculation fails
+
 /**
  * Create a new token with metadata using the client's wallet
  * @param {Object} params - Token creation parameters
@@ -205,16 +210,14 @@ export async function createTokenWithMetadata({
  * @returns {Promise<number>} Estimated cost in SOL
  */
 export async function estimateTokenCreationCost(connection) {
-  // Constants for estimation
-  const METADATA_ACCOUNT_RENT = 0.01 * LAMPORTS_PER_SOL; // Approximate metadata account rent
-  const TRANSACTION_FEES = 0.005 * LAMPORTS_PER_SOL; // Approximate transaction fees
-  
   try {
     const mintRent = await getMinimumBalanceForRentExemptMint(connection);
-    const totalLamports = mintRent + METADATA_ACCOUNT_RENT + TRANSACTION_FEES;
+    const totalLamports = mintRent + 
+                         (METADATA_ACCOUNT_RENT_SOL * LAMPORTS_PER_SOL) + 
+                         (TRANSACTION_FEES_SOL * LAMPORTS_PER_SOL);
     return totalLamports / LAMPORTS_PER_SOL;
   } catch (error) {
     console.error('Error estimating cost:', error);
-    return 0.02; // Fallback estimate
+    return FALLBACK_ESTIMATE_SOL;
   }
 }

@@ -3,7 +3,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { Connection, LAMPORTS_PER_SOL, clusterApiUrl } from '@solana/web3.js';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
-import { createTokenWithMetadata, estimateTokenCreationCost } from '../utils/tokenCreation';
+import { createTokenWithMetadata, estimateTokenCreationCost, FALLBACK_ESTIMATE_SOL } from '../utils/tokenCreation';
 
 const BACKEND_URL = "https://learnback-twta.onrender.com";
 
@@ -183,9 +183,9 @@ export default function Home() {
     // Check wallet balance
     if (clientWalletBalance !== null) {
       const balanceInLamports = Math.floor(parseFloat(clientWalletBalance) * LAMPORTS_PER_SOL);
-      const requiredLamports = Math.floor((estimatedCost || 0.02) * LAMPORTS_PER_SOL);
+      const requiredLamports = Math.floor((estimatedCost || FALLBACK_ESTIMATE_SOL) * LAMPORTS_PER_SOL);
       if (balanceInLamports < requiredLamports) {
-        setSubmitStatus(`Недостаточно SOL в кошельке. Необходимо минимум ${(estimatedCost || 0.02).toFixed(4)} SOL.`);
+        setSubmitStatus(`Недостаточно SOL в кошельке. Необходимо минимум ${(estimatedCost || FALLBACK_ESTIMATE_SOL).toFixed(4)} SOL.`);
         setSubmitStatusClass("status-message error");
         console.log('[ERROR] Submit: Insufficient balance');
         return;
