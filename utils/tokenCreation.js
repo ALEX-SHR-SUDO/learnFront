@@ -37,6 +37,8 @@ import {
   PROGRAM_ID as MPL_TOKEN_METADATA_PROGRAM_ID,
 } from '@metaplex-foundation/mpl-token-metadata';
 
+import { none } from "@metaplex-foundation/umi";
+
 // Cost estimation constants (in SOL)
 // Note: These are approximate values and may need periodic updates
 // as network conditions and rent requirements change
