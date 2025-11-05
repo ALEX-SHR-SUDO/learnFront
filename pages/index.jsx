@@ -107,7 +107,14 @@ export default function Home() {
     }
   };
 
-  // Helper function to determine image MIME type from URL
+  /**
+   * Determine image MIME type from URL file extension
+   * @param {string} url - The URL of the image file
+   * @returns {string} MIME type string (e.g., 'image/png', 'image/jpeg', 'image/svg+xml')
+   * 
+   * Supported file types: PNG, JPEG/JPG, GIF, SVG, WebP
+   * Defaults to 'image/png' if no recognized extension is found
+   */
   const getImageMimeType = (url) => {
     const match = url.match(/\.(jpg|jpeg|png|gif|svg|webp)$/i);
     if (!match) return "image/png"; // Default to PNG
