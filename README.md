@@ -14,13 +14,15 @@ A Next.js application for creating fungible SPL tokens on Solana with proper Met
 
 The tokens created by this application are **fungible SPL tokens** with the following characteristics:
 
-- `tokenStandard: 2` (Fungible) - Indicates a fungible SPL token
+- `tokenStandard: 2` (Fungible) - Explicitly set using `SetTokenStandard` instruction
 - `editionNonce: 255 or 251` (No edition) - Fungible tokens don't have editions
 - `sellerFeeBasisPoints: 0` - No royalties (NFT-specific feature)
 - `creators: null` - No creator attribution (NFT-specific)
 - `collection: null` - Not part of an NFT collection
 - `decimals > 0` - Allows fractional amounts (NFTs have decimals=0)
 - `supply > 1` - Can mint multiple tokens (NFTs have supply=1)
+
+The application uses the `SetTokenStandard` instruction to explicitly mark tokens as fungible, ensuring proper identification by blockchain explorers like Solscan.
 
 See [METADATA_STRUCTURE.md](./METADATA_STRUCTURE.md) for detailed documentation.
 
