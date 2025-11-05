@@ -1,6 +1,6 @@
 # Examples
 
-This directory contains example scripts for working with SPL token metadata.
+This directory contains example scripts and documentation for working with SPL token metadata.
 
 ## verifyTokenMetadata.js
 
@@ -80,3 +80,17 @@ isMutable: 0 ✅ (Immutable)
 🔗 View on Solscan:
 https://solscan.io/token/FeR8VBqNRSUD5NtXAj2n3j1dAHkZHfyDktKuLXD4pump?cluster=devnet
 ```
+
+## memoExample.md
+
+Documentation explaining the transaction memo feature that adds human-readable metadata to token creation transactions.
+
+### What it covers
+
+- Memo format and structure
+- How to view memos on block explorers
+- Benefits of using transaction memos
+- Technical implementation details
+- Code examples
+
+See [memoExample.md](./memoExample.md) for complete documentation.
